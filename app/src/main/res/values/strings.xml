@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">HelpHandv1.0</string>
+
+    <string name="app_name1">Help</string>
+    <string name="app_name2">Hand</string>
+
+    <string name="login_title">Login</string>
+    <string name="login_subtitle">Welcome Back!</string>
+    <string name="login_email_username_hint">Email / Username</string>
+    <string name="login_password_hint">Password</string>
+    <string name="login_doNotHaveAnAccount">Do not have an account yet? Sign Up here</string>
+
+    <string name="signup_title">Sign Up</string>
+    <string name="signup_subtitle">let\'s start sharing today</string>
+    <string name="signup_email_hint">Email Address</string>
+    <string name="signup_username_hint">Username</string>
+    <string name="signup_password_hint">Password</string>
+    <string name="signup_password_conf_hint">Confirm Password</string>
+    <string name="signup_alreadyRegistered">Already have an account? Login here</string>
+</resources>
