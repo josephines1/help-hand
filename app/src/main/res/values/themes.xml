@@ -3,6 +3,11 @@
     <style name="Base.Theme.HelpHandv10" parent="Theme.AppCompat.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/secondary</item>
+        <item name="colorControlNormal">@color/text</item>
+        <item name="colorControlActivated">@color/primary</item>
+
         <item name="android:fontFamily">@font/poppins_regular</item>
         <item name="android:textColor">@color/text</item>
     </style>
