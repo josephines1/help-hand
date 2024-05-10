@@ -1,4 +1,4 @@
-package com.example.helphandv10
+package com.example.helphandv10.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -7,6 +7,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.helphandv10.Donations
+import com.example.helphandv10.R
 import java.sql.Timestamp
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
