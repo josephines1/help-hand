@@ -76,9 +76,13 @@ class HomeFragment : Fragment() {
         initDummyData()
 
         recyclerView = view.findViewById(R.id.rv_donations)
+
+        val initialPaddingBottom = resources.getDimensionPixelSize(R.dimen.m3_bottom_nav_min_height)
+        val additionalPadding = (24 * resources.displayMetrics.density + 0.5f).toInt()
+        val newPaddingBottom = initialPaddingBottom + additionalPadding
+        recyclerView.setPadding(recyclerView.paddingLeft, recyclerView.paddingTop, recyclerView.paddingRight, newPaddingBottom)
+
         recyclerView.layoutManager = LinearLayoutManager(context)
-        recyclerView.setHasFixedSize(true)
-        recyclerView.setNestedScrollingEnabled(false);
         adapter = ListAdapter(donationsList)
         recyclerView.adapter = adapter
     }
