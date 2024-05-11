@@ -8,11 +8,16 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.helphandv10.adapter.ListAdapter
+import com.example.helphandv10.model.DonationConfirmation
+import com.example.helphandv10.model.Donations
+import com.example.helphandv10.model.DonorConfirmation
+import com.example.helphandv10.model.ShippingConfirmation
+import com.google.firebase.Timestamp
 import java.util.Date
-import java.sql.Timestamp
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
+import java.util.Calendar
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -82,7 +87,7 @@ class HomeFragment : Fragment() {
         recyclerView.setPadding(recyclerView.paddingLeft, recyclerView.paddingTop, recyclerView.paddingRight, newPaddingBottom)
 
         recyclerView.layoutManager = LinearLayoutManager(context)
-        adapter = ListAdapter(donationsList)
+        adapter = ListAdapter(context, donationsList)
         recyclerView.adapter = adapter
     }
 
@@ -163,13 +168,14 @@ class HomeFragment : Fragment() {
     }
 
     fun convertLocalDateToTimestamp(year: Int, month: Int, day: Int): Timestamp {
-        // Buat LocalDate dari input
-        val localDate = LocalDate.of(year, month, day)
-        // Konversi LocalDate ke LocalDateTime di awal hari
-        val startOfDay = localDate.atTime(LocalTime.MIN)
-        // Konversi LocalDateTime ke java.util.Date
-        val date = Date.from(startOfDay.atZone(ZoneId.systemDefault()).toInstant())
-        // Konversi Date ke Timestamp
-        return Timestamp(date.time)
+        val calendar = Calendar.getInstance().apply {
+            set(year, month - 1, day) // Bulan dimulai dari 0 (Januari) hingga 11 (Desember)
+        }
+
+        // Mendapatkan objek Date dari Calendar
+        val date = calendar.time
+
+        // Membuat objek Timestamp dari Date
+        return Timestamp(date)
     }
 }

@@ -2,14 +2,18 @@ package com.example.helphandv10.activity
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.helphandv10.R
 import com.example.helphandv10.adapter.ItemNeededAdapter
+import com.example.helphandv10.model.Donations
 
 class DonationDetailActivity : AppCompatActivity() {
     private lateinit var itemsRecyclerView: RecyclerView
@@ -25,9 +29,35 @@ class DonationDetailActivity : AppCompatActivity() {
             insets
         }
 
+        val donationDetail: Donations? = intent.getParcelableExtra("DONATION")
+
+        val title = donationDetail?.title
+        val imageURL = donationDetail?.donationImageUrl
+        val itemNeeded = donationDetail?.itemsNeeded
+        val organizer = donationDetail?.organizer
+
+        val tv_title = findViewById<TextView>(R.id.tv_detail_title)
+        val iv_image = findViewById<ImageView>(R.id.iv_detail_image)
+        val tv_organizer = findViewById<TextView>(R.id.tv_organizer)
+
+        tv_title.text = title
+
+        Glide.with(this)
+            .load(imageURL)
+            .centerCrop()
+            .into(iv_image)
+
+        tv_organizer.text = organizer
+
         itemsRecyclerView = findViewById(R.id.rv_items_needed)
-        itemNeededAdapter = ItemNeededAdapter(listOf("Pakaian", "Makanan Kaleng", "Selimut"))
+        itemNeededAdapter = itemNeeded?.let { ItemNeededAdapter(it) }!!
         itemsRecyclerView.adapter = itemNeededAdapter
         itemsRecyclerView.layoutManager = LinearLayoutManager(this)
+
+        val iconBack = findViewById<ImageView>(R.id.ic_back)
+
+        iconBack.setOnClickListener{
+            finish()
+        }
     }
 }

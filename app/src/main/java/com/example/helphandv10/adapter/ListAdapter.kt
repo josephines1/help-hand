@@ -1,5 +1,7 @@
 package com.example.helphandv10.adapter
 
+import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -7,14 +9,14 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.helphandv10.Donations
+import com.example.helphandv10.model.Donations
 import com.example.helphandv10.R
-import java.sql.Timestamp
+import com.example.helphandv10.activity.DonationDetailActivity
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-class ListAdapter(val donation: List<Donations>) : RecyclerView.Adapter<ListAdapter.ViewHolder>() {
+class ListAdapter(private val context: Context?, val donation: List<Donations>) : RecyclerView.Adapter<ListAdapter.ViewHolder>() {
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val imageView: ImageView = itemView.findViewById(R.id.iv_item_image)
         val title: TextView = itemView.findViewById(R.id.tv_item_title)
@@ -40,9 +42,15 @@ class ListAdapter(val donation: List<Donations>) : RecyclerView.Adapter<ListAdap
             .load(item.donationImageUrl)
             .centerCrop()
             .into(holder.imageView)
+
+        holder.itemView.setOnClickListener {
+            val intent = Intent(context, DonationDetailActivity::class.java)
+            intent.putExtra("DONATION", item)
+            context?.startActivity(intent)
+        }
     }
 
-    private fun formatTimestamp(timestamp: Timestamp): String {
+    private fun formatTimestamp(timestamp: com.google.firebase.Timestamp): String {
         val formatter = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale("id", "ID"))
         // Mengonversi Timestamp ke LocalDateTime
         val localDateTime = timestamp.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()

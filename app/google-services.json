@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "255640369614",
+    "project_id": "helphand-a236c",
+    "storage_bucket": "helphand-a236c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:255640369614:android:83854bc94a594537ab939f",
+        "android_client_info": {
+          "package_name": "com.example.helphandv10"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDmmiJsMCSJOwbEkjjlF15mzNz9WkEEo5E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
