@@ -23,6 +23,7 @@ data class Donations(
         override fun Donations.write(parcel: Parcel, flags: Int) {
             parcel.writeString(title)
             parcel.writeString(donationImageUrl)
+            parcel.writeString(location)
             parcel.writeString(organizer)
             parcel.writeParcelable(deadline, flags)
             parcel.writeStringList(itemsNeeded)
@@ -34,7 +35,7 @@ data class Donations(
                 parcel.readString() ?: "",
                 parcel.readString() ?: "",
                 parcel.readString() ?: "",
-                "",
+                parcel.readString() ?: "",
                 parcel.readParcelable(Timestamp::class.java.classLoader) ?: Timestamp.now(),
                 parcel.createStringArrayList() ?: emptyList(),
                 parcel.readHashMap(DonorConfirmation::class.java.classLoader) as HashMap<String, DonorConfirmation>?

@@ -35,19 +35,21 @@ class DonationDetailActivity : AppCompatActivity() {
         val imageURL = donationDetail?.donationImageUrl
         val itemNeeded = donationDetail?.itemsNeeded
         val organizer = donationDetail?.organizer
+        val location = donationDetail?.location
 
         val tv_title = findViewById<TextView>(R.id.tv_detail_title)
         val iv_image = findViewById<ImageView>(R.id.iv_detail_image)
         val tv_organizer = findViewById<TextView>(R.id.tv_organizer)
+        val tv_location = findViewById<TextView>(R.id.tv_location)
 
         tv_title.text = title
+        tv_organizer.text = organizer
+        tv_location.text = location
 
         Glide.with(this)
             .load(imageURL)
             .centerCrop()
             .into(iv_image)
-
-        tv_organizer.text = organizer
 
         itemsRecyclerView = findViewById(R.id.rv_items_needed)
         itemNeededAdapter = itemNeeded?.let { ItemNeededAdapter(it) }!!
