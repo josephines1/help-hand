@@ -6,7 +6,7 @@
 
     <string name="login_title">Login</string>
     <string name="login_subtitle">Welcome Back!</string>
-    <string name="login_email_username_hint">Email / Username</string>
+    <string name="login_email_hint">Email</string>
     <string name="login_password_hint">Password</string>
     <string name="login_doNotHaveAnAccount">Do not have an account yet? Sign Up here</string>
 

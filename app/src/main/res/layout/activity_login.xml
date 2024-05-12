@@ -95,13 +95,13 @@
         app:layout_constraintTop_toBottomOf="@+id/iv_loginIllustration">
 
         <EditText
-            android:id="@+id/et_loginEmailUsername"
+            android:id="@+id/et_loginEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:background="@drawable/edit_text_rounded_corner"
             android:ems="10"
-            android:hint="@string/login_email_username_hint"
+            android:hint="@string/login_email_hint"
             android:inputType="text"
             android:padding="16dp"
             android:paddingStart="24dp"
@@ -123,7 +123,7 @@
             android:textSize="14sp" />
 
         <Button
-            android:id="@+id/button_signUp"
+            android:id="@+id/btn_login"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"

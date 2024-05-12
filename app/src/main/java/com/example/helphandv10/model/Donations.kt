@@ -10,12 +10,13 @@ import com.google.firebase.Timestamp
 data class Donations(
     val title: String,
     val donationImageUrl: String,
+    val location: String,
     val organizer: String,
     val deadline: Timestamp,
     val itemsNeeded: List<String>,
     val donors: Map<String, DonorConfirmation>? = null // Map dari UserID ke DonorConfirmation
 ): Parcelable {
-    constructor(s: String, s1: String, s2: String, s3: String) : this("", "", "", Timestamp.now(), emptyList())
+    constructor(s: String, s1: String, s2: String, s3: String) : this("", "", "", "", Timestamp.now(), emptyList())
 
     companion object : Parceler<Donations> {
 
@@ -33,6 +34,7 @@ data class Donations(
                 parcel.readString() ?: "",
                 parcel.readString() ?: "",
                 parcel.readString() ?: "",
+                "",
                 parcel.readParcelable(Timestamp::class.java.classLoader) ?: Timestamp.now(),
                 parcel.createStringArrayList() ?: emptyList(),
                 parcel.readHashMap(DonorConfirmation::class.java.classLoader) as HashMap<String, DonorConfirmation>?

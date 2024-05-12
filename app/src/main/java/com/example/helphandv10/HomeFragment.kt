@@ -1,18 +1,27 @@
 package com.example.helphandv10
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.helphandv10.activity.LoginActivity
 import com.example.helphandv10.adapter.ListAdapter
 import com.example.helphandv10.model.DonationConfirmation
 import com.example.helphandv10.model.Donations
 import com.example.helphandv10.model.DonorConfirmation
 import com.example.helphandv10.model.ShippingConfirmation
+import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
+import com.google.firebase.firestore.FirebaseFirestore
 import java.util.Date
 import java.time.LocalDate
 import java.time.LocalTime
@@ -77,6 +86,29 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val iv_userPhoto = view.findViewById<ImageView>(R.id.iv_userPhotoProfile)
+        val tv_username = view.findViewById<TextView>(R.id.tv_username)
+
+        val firestore = FirebaseFirestore.getInstance()
+
+        val uid = FirebaseAuth.getInstance().currentUser?.uid
+
+        if (uid != null) {
+            firestore.collection("users").document(uid)
+                .get()
+                .addOnSuccessListener { document ->
+                    if (document != null && document.exists()) {
+                        val username = document.getString("username")
+                        tv_username.text = username
+                    } else {
+                        tv_username.text = "Orang Baik!"
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Log.e("HomeFragment", e.toString())
+                }
+        }
+
         initDummyData()
 
         recyclerView = view.findViewById(R.id.rv_donations)
@@ -95,6 +127,7 @@ class HomeFragment : Fragment() {
         val donation1 = Donations(
             title = "Bantuan Korban Banjir",
             donationImageUrl = "https://www.redcross.ca/getmedia/8098bc8d-af28-4703-9155-0323e360a1b2/flooding460.jpg.aspx;.pdf;?width=350&height=237",
+            location = "Jakarta Selatan",
             organizer = "Budi",
             deadline = convertLocalDateToTimestamp(2024, 8, 30),
             itemsNeeded = listOf("Pakaian", "Makanan Kaleng", "Selimut"),
@@ -131,7 +164,8 @@ class HomeFragment : Fragment() {
         val donation2 = Donations(
             title = "Bantuan Korban Banjir 2",
             donationImageUrl = "https://www.redcross.ca/getmedia/8098bc8d-af28-4703-9155-0323e360a1b2/flooding460.jpg.aspx;.pdf;?width=350&height=237",
-            organizer = "Budi",
+            location = "Tangerang Selatan",
+            organizer = "Rahmat",
             deadline = convertLocalDateToTimestamp(2024, 8, 30),
             itemsNeeded = listOf("Pakaian", "Makanan Kaleng", "Selimut"),
             donors = mapOf(
@@ -167,7 +201,7 @@ class HomeFragment : Fragment() {
         donationsList = listOf(donation1, donation2)
     }
 
-    fun convertLocalDateToTimestamp(year: Int, month: Int, day: Int): Timestamp {
+    private fun convertLocalDateToTimestamp(year: Int, month: Int, day: Int): Timestamp {
         val calendar = Calendar.getInstance().apply {
             set(year, month - 1, day) // Bulan dimulai dari 0 (Januari) hingga 11 (Desember)
         }

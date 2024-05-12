@@ -36,9 +36,10 @@
                         app:cardCornerRadius="50dp">
 
                         <ImageView
+                            android:id="@+id/iv_userPhotoProfile"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:background="@color/neutral_dark" />
+                            app:srcCompat="@drawable/icon_placeholder_photo_profile_secondary" />
 
                     </androidx.cardview.widget.CardView>
 
@@ -54,11 +55,11 @@
                             android:text="Hello, " />
 
                         <TextView
+                            android:id="@+id/tv_username"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:fontFamily="@font/poppins_bold"
                             android:gravity="center"
-                            android:text="Username"
                             android:textStyle="bold" />
 
                     </LinearLayout>
