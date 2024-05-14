@@ -1,6 +1,7 @@
 package com.example.helphandv10
 
 import android.app.Application
+import com.example.helphandv10.di.firebaseModule
 import com.example.helphandv10.di.repositoryModule
 import com.example.helphandv10.di.viewModelModule
 import org.koin.android.ext.koin.androidContext
@@ -16,6 +17,7 @@ class App : Application() {
             modules(listOf(
                 viewModelModule,
                 repositoryModule,
+                firebaseModule,
             ))
         }
     }

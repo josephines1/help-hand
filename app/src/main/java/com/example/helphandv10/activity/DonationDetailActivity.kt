@@ -1,7 +1,9 @@
 package com.example.helphandv10.activity
 
 import android.annotation.SuppressLint
+import android.content.ContentValues.TAG
 import android.os.Bundle
+import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
@@ -14,6 +16,9 @@ import com.bumptech.glide.Glide
 import com.example.helphandv10.R
 import com.example.helphandv10.adapter.ItemNeededAdapter
 import com.example.helphandv10.model.Donations
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
 
 class DonationDetailActivity : AppCompatActivity() {
     private lateinit var itemsRecyclerView: RecyclerView
@@ -34,7 +39,7 @@ class DonationDetailActivity : AppCompatActivity() {
         val title = donationDetail?.title
         val imageURL = donationDetail?.donationImageUrl
         val itemNeeded = donationDetail?.itemsNeeded
-        val organizer = donationDetail?.organizer
+        val organizerIdPath = donationDetail?.organizerId
         val location = donationDetail?.location
 
         val tv_title = findViewById<TextView>(R.id.tv_detail_title)
@@ -43,8 +48,30 @@ class DonationDetailActivity : AppCompatActivity() {
         val tv_location = findViewById<TextView>(R.id.tv_location)
 
         tv_title.text = title
-        tv_organizer.text = organizer
         tv_location.text = location
+
+        // Log the organizerIdPath for debugging
+        Log.d(TAG, "Organizer ID Path: $organizerIdPath")
+
+        // Kueri pengguna dengan ID pengatur acara
+        val userRef = organizerIdPath?.let {
+            FirebaseFirestore.getInstance().document(it) // Gunakan path yang valid
+        }
+        userRef?.get()
+            ?.addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    // Dokumen pengguna ditemukan
+                    val organizerName = document.getString("username")
+                    tv_organizer.text = organizerName
+                } else {
+                    // Dokumen pengguna tidak ditemukan atau tidak ada
+                    tv_organizer.text = "Orang Baik"
+                }
+            }
+            ?.addOnFailureListener { exception ->
+                // Penanganan kesalahan saat mengambil dokumen pengguna
+                Log.e(TAG, "Error getting organizer document", exception)
+            }
 
         Glide.with(this)
             .load(imageURL)

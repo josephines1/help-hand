@@ -9,23 +9,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.helphandv10.activity.LoginActivity
 import com.example.helphandv10.adapter.ListAdapter
+import com.example.helphandv10.databinding.FragmentHomeBinding
 import com.example.helphandv10.model.DonationConfirmation
 import com.example.helphandv10.model.Donations
 import com.example.helphandv10.model.DonorConfirmation
 import com.example.helphandv10.model.ShippingConfirmation
-import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
-import java.util.Date
-import java.time.LocalDate
-import java.time.LocalTime
-import java.time.ZoneId
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.Calendar
 
 // TODO: Rename parameter arguments, choose names that match
@@ -46,6 +42,9 @@ class HomeFragment : Fragment() {
     private lateinit var adapter: ListAdapter
     private lateinit var recyclerView: RecyclerView
     private lateinit var donationsList: List<Donations>
+    private val listViewModel: ListViewModel by viewModel()
+    private var _binding: FragmentHomeBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,8 +58,8 @@ class HomeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home, container, false)
+        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     companion object {
@@ -109,107 +108,22 @@ class HomeFragment : Fragment() {
                 }
         }
 
-        initDummyData()
-
         recyclerView = view.findViewById(R.id.rv_donations)
 
-        val initialPaddingBottom = resources.getDimensionPixelSize(R.dimen.m3_bottom_nav_min_height)
-        val additionalPadding = (24 * resources.displayMetrics.density + 0.5f).toInt()
-        val newPaddingBottom = initialPaddingBottom + additionalPadding
-        recyclerView.setPadding(recyclerView.paddingLeft, recyclerView.paddingTop, recyclerView.paddingRight, newPaddingBottom)
+        listViewModel.getDonations()
 
-        recyclerView.layoutManager = LinearLayoutManager(context)
-        adapter = ListAdapter(context, donationsList)
-        recyclerView.adapter = adapter
-    }
+        // Jika data terdeteksi
+        listViewModel.donations.observe(viewLifecycleOwner, Observer { donationsList ->
+            Log.d("HomeFragment", donationsList.toString())
+            val adapter = ListAdapter(requireContext(), donationsList)
+            binding.rvDonations.adapter = adapter
+            val initialPaddingBottom = resources.getDimensionPixelSize(R.dimen.m3_bottom_nav_min_height)
+            val additionalPadding = (24 * resources.displayMetrics.density + 0.5f).toInt()
+            val newPaddingBottom = initialPaddingBottom + additionalPadding
+            recyclerView.setPadding(recyclerView.paddingLeft, recyclerView.paddingTop, recyclerView.paddingRight, newPaddingBottom)
 
-    private fun initDummyData() {
-        val donation1 = Donations(
-            title = "Bantuan Korban Banjir",
-            donationImageUrl = "https://www.redcross.ca/getmedia/8098bc8d-af28-4703-9155-0323e360a1b2/flooding460.jpg.aspx;.pdf;?width=350&height=237",
-            location = "Jakarta Selatan",
-            organizer = "Budi",
-            deadline = convertLocalDateToTimestamp(2024, 8, 30),
-            itemsNeeded = listOf("Pakaian", "Makanan Kaleng", "Selimut"),
-            donors = mapOf(
-                "donor1" to DonorConfirmation(
-                    confirmation = DonationConfirmation(
-                        message = "Siap mengirimkan selimut dan pakaian",
-                        plannedShippingDate = convertLocalDateToTimestamp(2024, 8, 24),
-                        donationItemImageUrl = "url_to_image.jpg",
-                        shippingMethod = "Darat"
-                    ),
-                    shippingConfirmation = ShippingConfirmation(
-                        message = "Paket telah dikirim",
-                        expectedArrival = convertLocalDateToTimestamp(2024, 8, 24),
-                        shippingProofImageUrl = "url_to_shipping_proof.jpg"
-                    )
-                ),
-                "donor2" to DonorConfirmation(
-                    confirmation = DonationConfirmation(
-                        message = "Saya akan mengirim makanan kaleng",
-                        plannedShippingDate = convertLocalDateToTimestamp(2024, 8, 24),
-                        donationItemImageUrl = "url_to_food_image.jpg",
-                        shippingMethod = "Udara"
-                    ),
-                    shippingConfirmation = ShippingConfirmation(
-                        message = "Paket sedang dalam perjalanan",
-                        expectedArrival = convertLocalDateToTimestamp(2024, 8, 24),
-                        shippingProofImageUrl = "url_to_delivery_proof.jpg"
-                    )
-                )
-            )
-        )
-
-        val donation2 = Donations(
-            title = "Bantuan Korban Banjir 2",
-            donationImageUrl = "https://www.redcross.ca/getmedia/8098bc8d-af28-4703-9155-0323e360a1b2/flooding460.jpg.aspx;.pdf;?width=350&height=237",
-            location = "Tangerang Selatan",
-            organizer = "Rahmat",
-            deadline = convertLocalDateToTimestamp(2024, 8, 30),
-            itemsNeeded = listOf("Pakaian", "Makanan Kaleng", "Selimut"),
-            donors = mapOf(
-                "donor1" to DonorConfirmation(
-                    confirmation = DonationConfirmation(
-                        message = "Siap mengirimkan selimut dan pakaian",
-                        plannedShippingDate = convertLocalDateToTimestamp(2024, 8, 24),
-                        donationItemImageUrl = "url_to_image.jpg",
-                        shippingMethod = "Darat"
-                    ),
-                    shippingConfirmation = ShippingConfirmation(
-                        message = "Paket telah dikirim",
-                        expectedArrival = convertLocalDateToTimestamp(2024, 8, 24),
-                        shippingProofImageUrl = "url_to_shipping_proof.jpg"
-                    )
-                ),
-                "donor2" to DonorConfirmation(
-                    confirmation = DonationConfirmation(
-                        message = "Saya akan mengirim makanan kaleng",
-                        plannedShippingDate = convertLocalDateToTimestamp(2024, 8, 24),
-                        donationItemImageUrl = "url_to_food_image.jpg",
-                        shippingMethod = "Udara"
-                    ),
-                    shippingConfirmation = ShippingConfirmation(
-                        message = "Paket sedang dalam perjalanan",
-                        expectedArrival = convertLocalDateToTimestamp(2024, 8, 24),
-                        shippingProofImageUrl = "url_to_delivery_proof.jpg"
-                    )
-                )
-            )
-        )
-
-        donationsList = listOf(donation1, donation2)
-    }
-
-    private fun convertLocalDateToTimestamp(year: Int, month: Int, day: Int): Timestamp {
-        val calendar = Calendar.getInstance().apply {
-            set(year, month - 1, day) // Bulan dimulai dari 0 (Januari) hingga 11 (Desember)
-        }
-
-        // Mendapatkan objek Date dari Calendar
-        val date = calendar.time
-
-        // Membuat objek Timestamp dari Date
-        return Timestamp(date)
+            recyclerView.layoutManager = LinearLayoutManager(context)
+            recyclerView.adapter = adapter
+        })
     }
 }
