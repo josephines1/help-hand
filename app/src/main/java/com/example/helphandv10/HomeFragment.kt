@@ -1,6 +1,5 @@
 package com.example.helphandv10
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -12,17 +11,14 @@ import android.widget.TextView
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.helphandv10.adapter.ListAdapter
 import com.example.helphandv10.databinding.FragmentHomeBinding
-import com.example.helphandv10.model.DonationConfirmation
 import com.example.helphandv10.model.Donations
-import com.example.helphandv10.model.DonorConfirmation
-import com.example.helphandv10.model.ShippingConfirmation
-import com.google.firebase.Timestamp
+import com.example.helphandv10.viewmodel.donation.ListViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.util.Calendar
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -98,7 +94,13 @@ class HomeFragment : Fragment() {
                 .addOnSuccessListener { document ->
                     if (document != null && document.exists()) {
                         val username = document.getString("username")
+                        val photo = document.getString("photoProfileURL")
                         tv_username.text = username
+
+                        Glide.with(this)
+                            .load(photo)
+                            .centerCrop()
+                            .into(iv_userPhoto)
                     } else {
                         tv_username.text = "Orang Baik!"
                     }

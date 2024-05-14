@@ -95,7 +95,7 @@
         app:layout_constraintTop_toBottomOf="@+id/iv_loginIllustration">
 
         <EditText
-            android:id="@+id/et_loginEmail"
+            android:id="@+id/et_create_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"

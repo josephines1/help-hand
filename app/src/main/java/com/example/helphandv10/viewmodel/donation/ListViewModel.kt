@@ -1,4 +1,4 @@
-package com.example.helphandv10
+package com.example.helphandv10.viewmodel.donation
 
 import android.util.Log
 import androidx.lifecycle.LiveData

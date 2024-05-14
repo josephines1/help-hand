@@ -39,7 +39,7 @@
                     app:srcCompat="@drawable/group_17" />
 
                 <TextView
-                    android:id="@+id/tv_detail_top_text"
+                    android:id="@+id/tv_create_top_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"

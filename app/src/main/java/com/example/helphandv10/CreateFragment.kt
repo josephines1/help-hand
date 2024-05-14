@@ -1,25 +1,39 @@
 package com.example.helphandv10
 
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.TextView
+import android.widget.Toast
+import androidx.constraintlayout.widget.ConstraintLayout
+import com.example.helphandv10.activity.MainActivity
+import com.example.helphandv10.model.Donations
+import com.example.helphandv10.viewmodel.donation.AddViewModel
+import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.storage.FirebaseStorage
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import com.google.firebase.storage.StorageReference
+import java.util.Calendar
+import java.util.UUID
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [CreateFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class CreateFragment : Fragment() {
-    // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+
+    private val addViewModel: AddViewModel by viewModel()
+    private lateinit var storageReference: StorageReference
+    private lateinit var imageUri: Uri
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,20 +47,10 @@ class CreateFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_create, container, false)
     }
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment CreateFragment.
-         */
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
             CreateFragment().apply {
@@ -55,5 +59,98 @@ class CreateFragment : Fragment() {
                     putString(ARG_PARAM2, param2)
                 }
             }
+
+        const val IMAGE_PICK_CODE = 1000
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val et_title = view.findViewById<EditText>(R.id.et_create_title)
+        val et_date = view.findViewById<EditText>(R.id.et_create_date)
+        val et_needs = view.findViewById<EditText>(R.id.et_create_needs)
+        val cl_image = view.findViewById<ConstraintLayout>(R.id.cl_create_image)
+        val btn_create = view.findViewById<ConstraintLayout>(R.id.cl_btn_create)
+
+        storageReference = FirebaseStorage.getInstance().reference
+
+        cl_image.setOnClickListener {
+            val intent = Intent(Intent.ACTION_PICK)
+            intent.type = "image/*"
+            startActivityForResult(intent, IMAGE_PICK_CODE)
+        }
+
+        btn_create.setOnClickListener {
+            val title = et_title.text.toString()
+            val date = et_date.text.toString()
+            val needs = et_needs.text.toString().split(",").map { it.trim() }
+
+            if (title.isEmpty() || date.isEmpty() || needs.isEmpty()) {
+                Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val deadline = try {
+                val dateParts = date.split("-")
+                val year = dateParts[0].toInt()
+                val month = dateParts[1].toInt()
+                val day = dateParts[2].toInt()
+                Calendar.getInstance().apply {
+                    set(year, month - 1, day)
+                }.time
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+
+            if (deadline == null) {
+                Toast.makeText(context, "Invalid deadline format", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (::imageUri.isInitialized) {
+                val imageRef = storageReference.child("donations/${UUID.randomUUID()}")
+                imageRef.putFile(imageUri).addOnSuccessListener { taskSnapshot ->
+                    imageRef.downloadUrl.addOnSuccessListener { uri ->
+                        val imageUrl = uri.toString()
+                        val donation = Donations(
+                            title = title,
+                            donationImageUrl = imageUrl,
+                            location = "",
+                            organizerId = "users/${FirebaseAuth.getInstance().currentUser?.uid ?: ""}",
+                            deadline = Timestamp(deadline),
+                            itemsNeeded = needs,
+                            donors = mapOf()
+                        )
+                        addViewModel.addDonation(donation)
+                    }
+                }
+            } else {
+                Toast.makeText(context, "Image Required", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+        }
+
+        addViewModel.donationAdded.observe(viewLifecycleOwner) {
+            if (it) {
+                val intent = Intent(requireContext(), MainActivity::class.java)
+                startActivity(intent)
+                requireActivity().finish()
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK && requestCode == IMAGE_PICK_CODE) {
+            data?.data?.let {
+                imageUri = it
+                val imageIv = view?.findViewById<ImageView>(R.id.iv_preview)
+                imageIv?.setImageURI(imageUri)
+
+                val tv_upload_image = view?.findViewById<TextView>(R.id.tv_upload_image)
+                tv_upload_image?.visibility = View.GONE
+            }
+        }
     }
 }
