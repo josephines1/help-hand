@@ -117,7 +117,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Date Until" />
+                    android:text="Date Until (YYYY-MM-DD)" />
 
                 <EditText
                     android:id="@+id/et_create_date"
@@ -127,6 +127,33 @@
                     android:ems="10"
                     android:hint="Date Until"
                     android:inputType="date"
+                    android:padding="16dp"
+                    android:paddingStart="24dp"
+                    android:paddingEnd="24dp"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginTop="24dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Address" />
+
+                <EditText
+                    android:id="@+id/et_create_location"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/edit_text_rounded_corner"
+                    android:ems="10"
+                    android:hint="Donation Location"
+                    android:inputType="text"
                     android:padding="16dp"
                     android:paddingStart="24dp"
                     android:paddingEnd="24dp"
@@ -208,14 +235,14 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="32dp"
-                android:background="@drawable/button_secondary_rounded_corner"
-                android:paddingVertical="12dp">
+                android:background="@drawable/button_secondary_rounded_corner">
 
                 <TextView
                     android:id="@+id/textView7"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/poppins_medium"
+                    android:paddingVertical="12dp"
                     android:text="Create"
                     android:textAllCaps="true"
                     android:textColor="@color/white"

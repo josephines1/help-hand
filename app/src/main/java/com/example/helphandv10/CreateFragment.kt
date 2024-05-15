@@ -9,11 +9,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.helphandv10.activity.MainActivity
+import com.example.helphandv10.activity.SuccessCreateDonation
+import com.example.helphandv10.databinding.FragmentHomeBinding
 import com.example.helphandv10.model.Donations
 import com.example.helphandv10.viewmodel.donation.AddViewModel
 import com.google.firebase.Timestamp
@@ -30,6 +33,9 @@ private const val ARG_PARAM2 = "param2"
 class CreateFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
+
+    private var _binding: FragmentHomeBinding? = null
+    private val binding get() = _binding!!
 
     private val addViewModel: AddViewModel by viewModel()
     private lateinit var storageReference: StorageReference
@@ -68,9 +74,18 @@ class CreateFragment : Fragment() {
 
         val et_title = view.findViewById<EditText>(R.id.et_create_title)
         val et_date = view.findViewById<EditText>(R.id.et_create_date)
+        val et_location = view.findViewById<EditText>(R.id.et_create_location)
         val et_needs = view.findViewById<EditText>(R.id.et_create_needs)
         val cl_image = view.findViewById<ConstraintLayout>(R.id.cl_create_image)
         val btn_create = view.findViewById<ConstraintLayout>(R.id.cl_btn_create)
+
+        val initialMarginBottom = resources.getDimensionPixelSize(R.dimen.m3_bottom_nav_min_height)
+        val additionalMargin = (48 * resources.displayMetrics.density + 0.5f).toInt()
+        val newMarginBottom = initialMarginBottom + additionalMargin
+
+        val params = btn_create.layoutParams as ViewGroup.MarginLayoutParams
+        params.bottomMargin = newMarginBottom
+        btn_create.layoutParams = params
 
         storageReference = FirebaseStorage.getInstance().reference
 
@@ -83,9 +98,10 @@ class CreateFragment : Fragment() {
         btn_create.setOnClickListener {
             val title = et_title.text.toString()
             val date = et_date.text.toString()
+            val location = et_location.text.toString()
             val needs = et_needs.text.toString().split(",").map { it.trim() }
 
-            if (title.isEmpty() || date.isEmpty() || needs.isEmpty()) {
+            if (title.isEmpty() || date.isEmpty() || needs.isEmpty() || location.isEmpty()) {
                 Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -116,7 +132,7 @@ class CreateFragment : Fragment() {
                         val donation = Donations(
                             title = title,
                             donationImageUrl = imageUrl,
-                            location = "",
+                            location = location,
                             organizerId = "users/${FirebaseAuth.getInstance().currentUser?.uid ?: ""}",
                             deadline = Timestamp(deadline),
                             itemsNeeded = needs,
@@ -133,10 +149,18 @@ class CreateFragment : Fragment() {
 
         addViewModel.donationAdded.observe(viewLifecycleOwner) {
             if (it) {
-                val intent = Intent(requireContext(), MainActivity::class.java)
+                val intent = Intent(requireContext(), SuccessCreateDonation::class.java)
                 startActivity(intent)
                 requireActivity().finish()
             }
+        }
+
+        val iconBack = view.findViewById<ImageView>(R.id.ic_back)
+
+        iconBack.setOnClickListener{
+            val intent = Intent(requireContext(), MainActivity::class.java)
+            startActivity(intent)
+            requireActivity().finish()
         }
     }
 
@@ -146,6 +170,7 @@ class CreateFragment : Fragment() {
             data?.data?.let {
                 imageUri = it
                 val imageIv = view?.findViewById<ImageView>(R.id.iv_preview)
+                imageIv?.scaleType = ImageView.ScaleType.CENTER_CROP
                 imageIv?.setImageURI(imageUri)
 
                 val tv_upload_image = view?.findViewById<TextView>(R.id.tv_upload_image)

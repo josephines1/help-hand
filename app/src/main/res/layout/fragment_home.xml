@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fragment_home"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -122,7 +123,7 @@
                         android:textSize="10sp" />
 
                     <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/btn_create"
+                        android:id="@+id/cl_btn_home_create"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:layout_marginTop="16dp"

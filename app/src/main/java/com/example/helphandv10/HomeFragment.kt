@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -35,9 +36,7 @@ class HomeFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
 
-    private lateinit var adapter: ListAdapter
     private lateinit var recyclerView: RecyclerView
-    private lateinit var donationsList: List<Donations>
     private val listViewModel: ListViewModel by viewModel()
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
@@ -80,6 +79,28 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val btn_to_create = view.findViewById<ConstraintLayout>(R.id.cl_btn_home_create)
+
+        btn_to_create.setOnClickListener {
+            // Buat instance dari fragment Create
+            val createFragment = CreateFragment()
+
+            // Dapatkan instance FragmentManager
+            val fragmentManager = requireActivity().supportFragmentManager
+
+            // Mulai transaksi fragment
+            val transaction = fragmentManager.beginTransaction()
+
+            // Ganti fragment Home dengan fragment Create
+            transaction.replace(R.id.fragment_home, createFragment)
+
+            // Tambahkan transaksi ke back stack (jika ingin kembali ke fragment sebelumnya saat tombol back ditekan)
+            transaction.addToBackStack(null)
+
+            // Jalankan transaksi
+            transaction.commit()
+        }
 
         val iv_userPhoto = view.findViewById<ImageView>(R.id.iv_userPhotoProfile)
         val tv_username = view.findViewById<TextView>(R.id.tv_username)
