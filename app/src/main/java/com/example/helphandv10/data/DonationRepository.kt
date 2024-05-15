@@ -15,7 +15,7 @@ class DonationRepository(
         emit(Resource.Loading)
         try {
             val ref = firestoreDb.collection("Donations")
-            ref.add(donation)
+            donation.id?.let { ref.document(it).set(donation) }
             emit(Resource.Success(Unit))
         } catch (e: Error) {
             Log.e("DonationRepository: Insert", e.toString())
@@ -35,10 +35,11 @@ class DonationRepository(
         emit(Resource.Loading)
         try {
             val ref = firestoreDb.collection("Donations")
-            ref.document(donation.id.orEmpty()).update(
+            val donationId = donation.id ?: throw IllegalArgumentException("Donation ID is null")
+            ref.document(donationId).update(
                 mapOf(
                     "title" to donation.title,
-                    "donationImageUrl" to donation.donationImageUrl,
+                    "donationImageUrl" to imageUrl,
                     "location" to donation.location,
                     "organizer" to donation.organizerId,
                     "deadline" to donation.deadline,

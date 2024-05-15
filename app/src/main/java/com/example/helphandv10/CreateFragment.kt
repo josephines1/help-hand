@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -129,7 +130,9 @@ class CreateFragment : Fragment() {
                 imageRef.putFile(imageUri).addOnSuccessListener { taskSnapshot ->
                     imageRef.downloadUrl.addOnSuccessListener { uri ->
                         val imageUrl = uri.toString()
+                        val donationId = UUID.randomUUID().toString()
                         val donation = Donations(
+                            id = donationId,
                             title = title,
                             donationImageUrl = imageUrl,
                             location = location,
@@ -139,19 +142,23 @@ class CreateFragment : Fragment() {
                             donors = mapOf()
                         )
                         addViewModel.addDonation(donation)
+
+                        addViewModel.donationAdded.observe(viewLifecycleOwner) {
+                            if (it) {
+                                val intent = Intent(requireContext(), SuccessCreateDonation::class.java)
+                                intent.putExtra("donation_data", donation)
+                                if (donation != null) {
+                                    donation.id?.let { Log.d("ID ID ID ID: FROM CREATE", it) }
+                                }
+                                startActivity(intent)
+                                requireActivity().finish()
+                            }
+                        }
                     }
                 }
             } else {
                 Toast.makeText(context, "Image Required", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
-            }
-        }
-
-        addViewModel.donationAdded.observe(viewLifecycleOwner) {
-            if (it) {
-                val intent = Intent(requireContext(), SuccessCreateDonation::class.java)
-                startActivity(intent)
-                requireActivity().finish()
             }
         }
 

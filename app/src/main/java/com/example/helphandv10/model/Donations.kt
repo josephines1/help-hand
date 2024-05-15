@@ -36,6 +36,7 @@ data class Donations(
     companion object : Parceler<Donations> {
 
         override fun Donations.write(parcel: Parcel, flags: Int) {
+            parcel.writeString(id)
             parcel.writeString(title)
             parcel.writeString(donationImageUrl)
             parcel.writeString(location)
@@ -54,6 +55,7 @@ data class Donations(
         }
 
         override fun create(parcel: Parcel): Donations {
+            val id = parcel.readString() ?: ""
             val title = parcel.readString() ?: ""
             val donationImageUrl = parcel.readString() ?: ""
             val location = parcel.readString() ?: ""
@@ -75,7 +77,7 @@ data class Donations(
             }
 
             return Donations(
-                id = null,
+                id = id,
                 title = title,
                 donationImageUrl = donationImageUrl,
                 location = location,

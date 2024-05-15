@@ -1,13 +1,14 @@
 package com.example.helphandv10.activity
 
-import android.annotation.SuppressLint
-import android.content.ContentValues.TAG
+import android.content.ContentValues
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,28 +17,26 @@ import com.bumptech.glide.Glide
 import com.example.helphandv10.R
 import com.example.helphandv10.adapter.ItemNeededAdapter
 import com.example.helphandv10.model.Donations
-import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.firestore
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-class DonationDetailActivity : AppCompatActivity() {
+class ManageDonationActivity : AppCompatActivity() {
     private lateinit var itemsRecyclerView: RecyclerView
     private lateinit var itemNeededAdapter: ItemNeededAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_donation_detail)
+        setContentView(R.layout.activity_manage_donation)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        val donationDetail: Donations? = intent.getParcelableExtra("DONATION")
+        val donationDetail: Donations? = intent.getParcelableExtra("donation_data")
 
         val title = donationDetail?.title
         val imageURL = donationDetail?.donationImageUrl
@@ -57,7 +56,7 @@ class DonationDetailActivity : AppCompatActivity() {
         tv_date.text = "Deadline: ${donationDetail?.deadline?.let { formatTimestamp(it) }}"
 
         // Log the organizerIdPath for debugging
-        Log.d(TAG, "Organizer ID Path: $organizerIdPath")
+        Log.d(ContentValues.TAG, "Organizer ID Path: $organizerIdPath")
 
         // Kueri pengguna dengan ID pengatur acara
         val userRef = organizerIdPath?.let {
@@ -79,7 +78,7 @@ class DonationDetailActivity : AppCompatActivity() {
             }
             ?.addOnFailureListener { exception ->
                 // Penanganan kesalahan saat mengambil dokumen pengguna
-                Log.e(TAG, "Error getting organizer document", exception)
+                Log.e(ContentValues.TAG, "Error getting organizer document", exception)
             }
 
         Glide.with(this)
@@ -96,6 +95,14 @@ class DonationDetailActivity : AppCompatActivity() {
 
         iconBack.setOnClickListener{
             finish()
+        }
+
+        val btn_update = findViewById<ConstraintLayout>(R.id.cl_btn_update_donation)
+
+        btn_update.setOnClickListener{
+            val intent = Intent(this, DonationUpdateActivity::class.java)
+            intent.putExtra("data", donationDetail)
+            startActivity(intent)
         }
     }
 

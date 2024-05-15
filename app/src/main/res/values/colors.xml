@@ -22,6 +22,8 @@
 
     <color name="success">#22C55E</color>
 
+    <color name="warning">#FEF08A</color>
+
     <color name="background">#F1FCF9</color>
     <color name="text">#171717</color>
 </resources>

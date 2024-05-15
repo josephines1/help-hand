@@ -93,7 +93,7 @@ class HomeFragment : Fragment() {
             val transaction = fragmentManager.beginTransaction()
 
             // Ganti fragment Home dengan fragment Create
-            transaction.replace(R.id.fragment_home, createFragment)
+            transaction.replace(R.id.fragment_container, createFragment)
 
             // Tambahkan transaksi ke back stack (jika ingin kembali ke fragment sebelumnya saat tombol back ditekan)
             transaction.addToBackStack(null)
@@ -147,6 +147,10 @@ class HomeFragment : Fragment() {
 
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.adapter = adapter
+
+            val layoutParams = recyclerView.layoutParams
+            layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
+            recyclerView.layoutParams = layoutParams
         })
     }
 }
