@@ -3,6 +3,7 @@ package com.example.helphandv10.data
 import android.util.Log
 import com.example.helphandv10.model.Donations
 import com.example.helphandv10.utils.Resource
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -63,6 +64,38 @@ class DonationRepository(
         } catch (e: Error) {
             Log.e("DonationRepository: delete", e.toString())
             emit(Resource.Error(e.toString()))
+        }
+    }
+
+    fun getDonationsByDonor(): Flow<List<Donations>> = flow {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        if (userId != null) {
+            val ref = firestoreDb.collection("Donations")
+                .whereArrayContains("donors", userId)
+            val querySnapshot = ref.get().await()
+            if (!querySnapshot.isEmpty) {
+                emit(querySnapshot.toObjects(Donations::class.java))
+            } else {
+                emit(emptyList())
+            }
+        } else {
+            emit(emptyList())
+        }
+    }
+
+    fun getDonationsByOrganizer(): Flow<List<Donations>> = flow {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        if (userId != null) {
+            val ref = firestoreDb.collection("Donations")
+                .whereEqualTo("organizerId", "users/$userId")
+            val querySnapshot = ref.get().await()
+            if (!querySnapshot.isEmpty) {
+                emit(querySnapshot.toObjects(Donations::class.java))
+            } else {
+                emit(emptyList())
+            }
+        } else {
+            emit(emptyList())
         }
     }
 }

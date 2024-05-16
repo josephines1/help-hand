@@ -26,6 +26,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.net.URLDecoder
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -45,6 +46,12 @@ class DonationUpdateActivity : AppCompatActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
+        }
+
+        val iconBack = findViewById<ImageView>(R.id.ic_back)
+
+        iconBack.setOnClickListener{
+            finish()
         }
 
         val donation: Donations? = intent.getParcelableExtra("data")
@@ -138,8 +145,11 @@ class DonationUpdateActivity : AppCompatActivity() {
             if (currentDonation != null) {
                 if (::imageUri.isInitialized) {
 
-                    if(currentDonation.donationImageUrl != null) {
-                        val oldImageRef = storageReference.child(getFileNameFromUrl(currentDonation.donationImageUrl))
+                    if (currentDonation.donationImageUrl != null) {
+                        val oldImagePath = getFileNameFromUrl(currentDonation.donationImageUrl)
+                        val oldImageRef = storageReference.child(oldImagePath)
+
+                        Log.d("UpdateActivity", "Attempting to delete old image at path: $oldImagePath")
 
                         oldImageRef.delete().addOnSuccessListener {
                             Log.i("UpdateActivity", "Success deleting old image")
@@ -166,6 +176,15 @@ class DonationUpdateActivity : AppCompatActivity() {
                                 itemsNeeded = items,
                             )
                             updateViewModel.updateDonation(donationInput, imageUrl)
+
+                            updateViewModel.donationUpdated.observe(this) {
+                                if (it) {
+                                    val intent = Intent(this, ManageDonationActivity::class.java)
+                                    intent.putExtra("DONATION", donationInput)
+                                    startActivity(intent)
+                                    finish()
+                                }
+                            }
                         }
                     }
                 } else {
@@ -184,7 +203,7 @@ class DonationUpdateActivity : AppCompatActivity() {
                     updateViewModel.donationUpdated.observe(this) {
                         if (it) {
                             val intent = Intent(this, ManageDonationActivity::class.java)
-                            intent.putExtra("donation_data", donationInput)
+                            intent.putExtra("DONATION", donationInput)
                             startActivity(intent)
                             finish()
                         }
@@ -207,10 +226,11 @@ class DonationUpdateActivity : AppCompatActivity() {
         }
     }
 
-    private fun getFileNameFromUrl(url: String?): String {
-        val uri = Uri.parse(url)
-        val segments = uri.pathSegments
-        return segments.lastOrNull()?.split("?")?.first() ?: ""
+    fun getFileNameFromUrl(url: String): String {
+        val decodedUrl = URLDecoder.decode(url, "UTF-8")
+        val regex = Regex("""/o/(.*)\?alt=media""")
+        val matchResult = regex.find(decodedUrl)
+        return matchResult?.groupValues?.get(1) ?: throw IllegalArgumentException("Invalid URL: $url")
     }
 
     private fun showDatePickerDialog(et_date: EditText) {

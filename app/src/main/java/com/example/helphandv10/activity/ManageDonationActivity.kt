@@ -36,7 +36,7 @@ class ManageDonationActivity : AppCompatActivity() {
             insets
         }
 
-        val donationDetail: Donations? = intent.getParcelableExtra("donation_data")
+        val donationDetail: Donations? = intent.getParcelableExtra("DONATION")
 
         val title = donationDetail?.title
         val imageURL = donationDetail?.donationImageUrl

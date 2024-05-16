@@ -146,7 +146,7 @@ class CreateFragment : Fragment() {
                         addViewModel.donationAdded.observe(viewLifecycleOwner) {
                             if (it) {
                                 val intent = Intent(requireContext(), SuccessCreateDonation::class.java)
-                                intent.putExtra("donation_data", donation)
+                                intent.putExtra("DONATION", donation)
                                 if (donation != null) {
                                     donation.id?.let { Log.d("ID ID ID ID: FROM CREATE", it) }
                                 }

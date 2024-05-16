@@ -40,7 +40,7 @@ class SuccessCreateDonation : AppCompatActivity() {
             finish()
         }
 
-        val donation: Donations? = intent.getParcelableExtra("donation_data")
+        val donation: Donations? = intent.getParcelableExtra("DONATION")
         if (donation != null) {
             donation.id?.let { Log.d("ID ID ID ID: SUCCESS", it) }
         }
@@ -53,7 +53,7 @@ class SuccessCreateDonation : AppCompatActivity() {
 
         cl_btn_manage.setOnClickListener{
             val intent = Intent(this, ManageDonationActivity::class.java)
-            intent.putExtra("donation_data", donation)
+            intent.putExtra("DONATION", donation)
             startActivity(intent)
             finish()
         }
