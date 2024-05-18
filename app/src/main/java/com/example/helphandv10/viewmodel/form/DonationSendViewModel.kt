@@ -32,7 +32,9 @@ class DonationSendViewModel(private val donationRepository: DonationRepository) 
     }
 }
 
-class DonationSendViewModelFactory(private val donationRepository: DonationRepository) : ViewModelProvider.Factory {
+class DonationSendViewModelFactory(
+    private val donationRepository: DonationRepository
+) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(DonationSendViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")

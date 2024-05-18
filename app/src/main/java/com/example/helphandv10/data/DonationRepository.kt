@@ -6,6 +6,7 @@ import com.example.helphandv10.model.DonorConfirmation
 import com.example.helphandv10.utils.Resource
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -139,15 +140,33 @@ class DonationRepository(
             "shippingMethod" to deliveryMethod
         )
 
+        val dataToSave = hashMapOf(
+            "confirmation" to confirmationData
+        )
+
         val donationRef = firestoreDb.collection("Donations").document(donationId)
         val donorRef = donationRef.collection("Donors").document(userId)
 
         emit(Resource.Loading)
         try {
-            donorRef.set(confirmationData).await()
+            donorRef.set(dataToSave).await()
             emit(Resource.Success(Unit))
         } catch (e: Exception) {
             emit(Resource.Error(e.localizedMessage ?: "Error saving confirmation"))
+        }
+    }
+
+    fun getDonorsForDonation(donationId: String): Flow<Resource<List<DocumentSnapshot>>> = flow {
+        val donationRef = firestoreDb.collection("Donations").document(donationId)
+        val donorsRef = donationRef.collection("Donors")
+
+        emit(Resource.Loading)
+        try {
+            val querySnapshot = donorsRef.get().await()
+            val donorDocuments = querySnapshot.documents
+            emit(Resource.Success(donorDocuments))
+        } catch (e: Exception) {
+            emit(Resource.Error(e.localizedMessage ?: "Error fetching donors"))
         }
     }
 }

@@ -140,6 +140,12 @@ class DonationSendActivity : AppCompatActivity() {
                 }
             }
         })
+
+        val iconBack = findViewById<ImageView>(R.id.ic_back)
+
+        iconBack.setOnClickListener{
+            finish()
+        }
     }
 
     private fun saveDonation(message: String, deliveryDate: Timestamp, deliveryMethod: String, donationItemImageUrl: String, donation: Donations?) {

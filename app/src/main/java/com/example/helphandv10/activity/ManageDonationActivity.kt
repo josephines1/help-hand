@@ -11,7 +11,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -163,6 +162,14 @@ class ManageDonationActivity<Button> : AppCompatActivity() {
         val btn_delete = findViewById<ConstraintLayout>(R.id.cl_btn_delete_donation)
         btn_delete.setOnClickListener{
             showDeleteConfirmationDialog()
+        }
+
+        // Manage Request
+        val btn_manage_request = findViewById<ConstraintLayout>(R.id.cl_btn_manage_request)
+        btn_manage_request.setOnClickListener{
+            val intent = Intent(this, ManageDonorsActivity::class.java)
+            intent.putExtra("DONATION", donationDetail)
+            startActivity(intent)
         }
     }
 

@@ -3,6 +3,7 @@ package com.example.helphandv10.data
 import android.util.Log
 import com.example.helphandv10.model.Users
 import com.example.helphandv10.utils.Resource
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -20,6 +21,18 @@ class UsersRepository(
         } catch (e: Error) {
             Log.e("UsersRepository: Insert", e.toString())
             emit(Resource.Error(e.toString()))
+        }
+    }
+
+    fun getUserById(userId: String): Flow<Resource<DocumentSnapshot>> = flow {
+        val userRef = firestoreDb.collection("users").document(userId)
+
+        emit(Resource.Loading)
+        try {
+            val userSnapshot = userRef.get().await()
+            emit(Resource.Success(userSnapshot))
+        } catch (e: Exception) {
+            emit(Resource.Error(e.localizedMessage ?: "Error fetching user"))
         }
     }
 
