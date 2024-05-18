@@ -131,7 +131,9 @@ class DonationSendActivity : AppCompatActivity() {
                     // Show loading indicator
                 }
                 is Resource.Success -> {
-                    Toast.makeText(this, "Confirmation saved successfully", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Confirmation submitted successfully", Toast.LENGTH_SHORT).show()
+                    val intent = Intent(this, SuccessRequestSendDonation::class.java)
+                    startActivity(intent)
                     finish()
                 }
                 is Resource.Error -> {

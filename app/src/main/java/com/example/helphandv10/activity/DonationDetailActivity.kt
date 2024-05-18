@@ -25,6 +25,8 @@ import com.example.helphandv10.model.Donations
 import com.example.helphandv10.viewmodel.donation.HistoryViewModel
 import com.example.helphandv10.viewmodel.donation.HistoryViewModelFactory
 import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.launch
@@ -36,7 +38,9 @@ class DonationDetailActivity : AppCompatActivity() {
     private lateinit var itemsRecyclerView: RecyclerView
     private lateinit var itemNeededAdapter: ItemNeededAdapter
     private lateinit var donationViewModel: HistoryViewModel
+    private lateinit var auth: FirebaseAuth
 
+    @SuppressLint("ResourceAsColor")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -110,6 +114,11 @@ class DonationDetailActivity : AppCompatActivity() {
 
         val btn_donate = findViewById<TextView>(R.id.btn_donate)
 
+        auth = Firebase.auth
+        val currentUser = auth.currentUser
+        val currentUserId = currentUser?.uid
+        val organizerId = organizerIdPath?.substringAfterLast("/")
+
         val tv_track_donation = findViewById<TextView>(R.id.tv_track_donation)
         tv_track_donation.visibility = View.GONE
 
@@ -125,13 +134,23 @@ class DonationDetailActivity : AppCompatActivity() {
                 if (isDonationAlreadyMade) {
                     // Menonaktifkan tombol donasi
                     btn_donate.text = "You Already Donate"
+                    btn_donate.setTextColor(R.color.text)
                     btn_donate.setBackgroundResource(R.drawable.button_neutral_rounded_corner)
 
                     // Menampilkan text view untuk melacak donasi
                     tv_track_donation.visibility = View.VISIBLE
-                } else {
+                } else if(currentUserId != organizerId) {
                     btn_donate.setOnClickListener{
                         startActivity(Intent(this@DonationDetailActivity, DonationSendActivity::class.java).apply {
+                            putExtra("DONATION", donationDetail)
+                        })
+                        finish()
+                    }
+                } else {
+                    btn_donate.text = "Manage Donation"
+
+                    btn_donate.setOnClickListener{
+                        startActivity(Intent(this@DonationDetailActivity, ManageDonationActivity::class.java).apply {
                             putExtra("DONATION", donationDetail)
                         })
                         finish()
