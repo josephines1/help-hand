@@ -5,6 +5,7 @@ import android.content.ContentValues.TAG
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
@@ -12,15 +13,21 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.helphandv10.R
 import com.example.helphandv10.adapter.ItemNeededAdapter
+import com.example.helphandv10.data.DonationRepository
 import com.example.helphandv10.model.Donations
+import com.example.helphandv10.viewmodel.donation.HistoryViewModel
+import com.example.helphandv10.viewmodel.donation.HistoryViewModelFactory
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
+import kotlinx.coroutines.launch
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -28,6 +35,7 @@ import java.util.Locale
 class DonationDetailActivity : AppCompatActivity() {
     private lateinit var itemsRecyclerView: RecyclerView
     private lateinit var itemNeededAdapter: ItemNeededAdapter
+    private lateinit var donationViewModel: HistoryViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -102,11 +110,34 @@ class DonationDetailActivity : AppCompatActivity() {
 
         val btn_donate = findViewById<TextView>(R.id.btn_donate)
 
-        btn_donate.setOnClickListener{
-            val intent = Intent(this, DonationSendActivity::class.java)
-            intent.putExtra("DONATION", donationDetail)
-            startActivity(intent)
-            finish()
+        val tv_track_donation = findViewById<TextView>(R.id.tv_track_donation)
+        tv_track_donation.visibility = View.GONE
+
+        val firestoreDb = FirebaseFirestore.getInstance()
+        val donationRepository = DonationRepository(firestoreDb)
+        val factory = HistoryViewModelFactory(donationRepository)
+        donationViewModel = ViewModelProvider(this, factory).get(HistoryViewModel::class.java)
+        lifecycleScope.launch {
+            donationViewModel.getDonationsByDonor().collect { donations ->
+                // Memeriksa apakah ID donasi terkait ada dalam hasil query
+                val isDonationAlreadyMade = donations.any { it.id == donationDetail.id }
+
+                if (isDonationAlreadyMade) {
+                    // Menonaktifkan tombol donasi
+                    btn_donate.text = "You Already Donate"
+                    btn_donate.setBackgroundResource(R.drawable.button_neutral_rounded_corner)
+
+                    // Menampilkan text view untuk melacak donasi
+                    tv_track_donation.visibility = View.VISIBLE
+                } else {
+                    btn_donate.setOnClickListener{
+                        startActivity(Intent(this@DonationDetailActivity, DonationSendActivity::class.java).apply {
+                            putExtra("DONATION", donationDetail)
+                        })
+                        finish()
+                    }
+                }
+            }
         }
     }
 
