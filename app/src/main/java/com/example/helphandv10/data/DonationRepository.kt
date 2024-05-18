@@ -2,6 +2,7 @@ package com.example.helphandv10.data
 
 import android.util.Log
 import com.example.helphandv10.model.Donations
+import com.example.helphandv10.model.DonorConfirmation
 import com.example.helphandv10.utils.Resource
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
@@ -71,13 +72,36 @@ class DonationRepository(
     fun getDonationsByDonor(): Flow<List<Donations>> = flow {
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         if (userId != null) {
-            val ref = firestoreDb.collection("Donations")
-                .whereArrayContains("donors", userId)
-            val querySnapshot = ref.get().await()
-            if (!querySnapshot.isEmpty) {
-                emit(querySnapshot.toObjects(Donations::class.java))
-            } else {
+            try {
+                val donationsList = mutableListOf<Donations>()
+
+                // Mendapatkan referensi ke koleksi Donations
+                val donationsRef = firestoreDb.collection("Donations")
+
+                // Mengambil semua dokumen dari koleksi Donations
+                val querySnapshot = donationsRef.get().await()
+
+                // Iterasi melalui setiap dokumen Donations
+                for (donationDoc in querySnapshot.documents) {
+                    // Mendapatkan referensi ke sub-koleksi Donors dari setiap dokumen Donations
+                    val donorRef = donationDoc.reference.collection("Donors")
+
+                    // Mendapatkan dokumen DonorConfirmation yang memiliki dokumen id yang sama dengan userId
+                    val donorSnapshot = donorRef.document(userId).get().await()
+
+                    // Jika dokumen DonorConfirmation ada, maka tambahkan data Donations ke dalam list
+                    if (donorSnapshot.exists()) {
+                        val donation = donationDoc.toObject(Donations::class.java)
+                        if (donation != null) {
+                            donationsList.add(donation)
+                        }
+                    }
+                }
+
+                emit(donationsList)
+            } catch (e: Exception) {
                 emit(emptyList())
+                Log.e("DonationRepository", "Error getting donations by donor: ${e.message}", e)
             }
         } else {
             emit(emptyList())
