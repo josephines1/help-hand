@@ -3,6 +3,7 @@ package com.example.helphandv10.data
 import android.util.Log
 import com.example.helphandv10.model.Donations
 import com.example.helphandv10.utils.Resource
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.Flow
@@ -96,6 +97,33 @@ class DonationRepository(
             }
         } else {
             emit(emptyList())
+        }
+    }
+
+    fun saveDonationConfirmation(
+        userId: String,
+        donationId: String,
+        message: String,
+        deliveryDate: Timestamp,
+        donationItemImageUrl: String,
+        deliveryMethod: String
+    ): Flow<Resource<Unit>> = flow {
+        val confirmationData = hashMapOf(
+            "message" to message,
+            "plannedShippingDate" to deliveryDate,
+            "donationItemImageUrl" to donationItemImageUrl,
+            "shippingMethod" to deliveryMethod
+        )
+
+        val donationRef = firestoreDb.collection("Donations").document(donationId)
+        val donorRef = donationRef.collection("Donors").document(userId)
+
+        emit(Resource.Loading)
+        try {
+            donorRef.set(confirmationData).await()
+            emit(Resource.Success(Unit))
+        } catch (e: Exception) {
+            emit(Resource.Error(e.localizedMessage ?: "Error saving confirmation"))
         }
     }
 }

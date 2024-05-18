@@ -61,7 +61,8 @@
                             android:layout_height="match_parent"
                             android:fontFamily="@font/poppins_bold"
                             android:gravity="center"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            android:text="..."/>
 
                     </LinearLayout>
 

@@ -118,10 +118,12 @@ class HomeFragment : Fragment() {
                         val photo = document.getString("photoProfileURL")
                         tv_username.text = username
 
-                        Glide.with(this)
-                            .load(photo)
-                            .centerCrop()
-                            .into(iv_userPhoto)
+                        if(photo != "-") {
+                            Glide.with(this)
+                                .load(photo)
+                                .centerCrop()
+                                .into(iv_userPhoto)
+                        }
                     } else {
                         tv_username.text = "Orang Baik!"
                     }

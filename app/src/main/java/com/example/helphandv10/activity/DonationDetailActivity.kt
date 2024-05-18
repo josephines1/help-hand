@@ -2,12 +2,14 @@ package com.example.helphandv10.activity
 
 import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -95,6 +97,15 @@ class DonationDetailActivity : AppCompatActivity() {
         val iconBack = findViewById<ImageView>(R.id.ic_back)
 
         iconBack.setOnClickListener{
+            finish()
+        }
+
+        val btn_donate = findViewById<TextView>(R.id.btn_donate)
+
+        btn_donate.setOnClickListener{
+            val intent = Intent(this, DonationSendActivity::class.java)
+            intent.putExtra("DONATION", donationDetail)
+            startActivity(intent)
             finish()
         }
     }

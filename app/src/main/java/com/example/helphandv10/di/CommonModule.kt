@@ -6,6 +6,7 @@ import com.example.helphandv10.data.DonationRepository
 import com.example.helphandv10.viewmodel.donation.HistoryViewModel
 import com.example.helphandv10.viewmodel.donation.UpdateViewModel
 import com.example.helphandv10.viewmodel.donation.DeleteViewModel
+import com.example.helphandv10.viewmodel.form.DonationSendViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -15,6 +16,7 @@ val viewModelModule = module {
     viewModel { UpdateViewModel(get()) }
     viewModel { HistoryViewModel(get()) }
     viewModel { DeleteViewModel(get()) }
+    viewModel { DonationSendViewModel(get()) }
 }
 
 val repositoryModule = module {
