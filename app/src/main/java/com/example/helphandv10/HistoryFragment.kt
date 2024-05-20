@@ -2,6 +2,7 @@ package com.example.helphandv10
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -19,6 +20,7 @@ import com.example.helphandv10.data.DonationRepository
 import com.example.helphandv10.model.Donations
 import com.example.helphandv10.viewmodel.donation.HistoryViewModel
 import com.example.helphandv10.viewmodel.donation.HistoryViewModelFactory
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 
@@ -70,10 +72,14 @@ class HistoryFragment : Fragment() {
         tvAsOrganizer = view.findViewById(R.id.tv_as_organizer)
         tvNoData = view.findViewById(R.id.tvNoData)
 
-        setupAdapter()
+        showAsOrganizer = arguments?.getBoolean("showAsOrganizer", false) ?: false
+        Log.d("Show As Organizer", showAsOrganizer.toString())
+        if(showAsOrganizer) {
+            updateTextViewColors()
+        }
 
         val initialPaddingBottom = resources.getDimensionPixelSize(R.dimen.m3_bottom_nav_min_height)
-        val additionalPadding = (32 * resources.displayMetrics.density + 0.5f).toInt()
+        val additionalPadding = (48 * resources.displayMetrics.density + 0.5f).toInt()
         val newPaddingBottom = initialPaddingBottom + additionalPadding
         recyclerView.setPadding(recyclerView.paddingLeft, recyclerView.paddingTop, recyclerView.paddingRight, newPaddingBottom)
 
@@ -82,7 +88,7 @@ class HistoryFragment : Fragment() {
         val factory = HistoryViewModelFactory(donationRepository)
         donationViewModel = ViewModelProvider(this, factory).get(HistoryViewModel::class.java)
 
-        // Initial data load
+        setupAdapter()
         loadData()
 
         // Set up the listener for the TextView tv_as_organizer

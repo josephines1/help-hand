@@ -12,6 +12,8 @@ import com.example.helphandv10.R
 import com.example.helphandv10.databinding.ActivityMainBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import android.widget.Toast
+import com.example.helphandv10.HistoryFragment
+import com.example.helphandv10.HomeFragment
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -44,9 +46,29 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
+        if (intent.getBooleanExtra("showHistoryFragment", false)) {
+            navigateToHistoryFragment()
+        }
+
         val navBottom: BottomNavigationView = binding.navBottom
         val navController = findNavController(R.id.nav_host_fragment_activity_main)
 
         navBottom.setupWithNavController(navController)
+    }
+
+    private fun navigateToHistoryFragment() {
+        val historyFragment = HistoryFragment.newInstance("param1", "param2")
+        val bundle = Bundle().apply {
+            putBoolean("showAsOrganizer", true)
+        }
+        historyFragment.arguments = bundle
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, historyFragment)
+            .addToBackStack(null)
+            .commit()
+
+        // Mengubah item terpilih di BottomNavigationView
+        val bottomNav = findViewById<BottomNavigationView>(R.id.nav_bottom)
+        bottomNav.selectedItemId = R.id.nav_item_create
     }
 }
