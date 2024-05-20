@@ -73,7 +73,7 @@ class HistoryFragment : Fragment() {
         setupAdapter()
 
         val initialPaddingBottom = resources.getDimensionPixelSize(R.dimen.m3_bottom_nav_min_height)
-        val additionalPadding = (24 * resources.displayMetrics.density + 0.5f).toInt()
+        val additionalPadding = (32 * resources.displayMetrics.density + 0.5f).toInt()
         val newPaddingBottom = initialPaddingBottom + additionalPadding
         recyclerView.setPadding(recyclerView.paddingLeft, recyclerView.paddingTop, recyclerView.paddingRight, newPaddingBottom)
 

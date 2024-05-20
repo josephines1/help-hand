@@ -1,5 +1,6 @@
 package com.example.helphandv10.activity
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
@@ -44,6 +45,7 @@ class DonationSendActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var storageReference: StorageReference
     private lateinit var imageUri: Uri
+    @SuppressLint("ResourceAsColor")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -73,6 +75,7 @@ class DonationSendActivity : AppCompatActivity() {
         val rbDropOff: RadioButton = findViewById(R.id.rb_send_drop_off)
         val rbCourier: RadioButton = findViewById(R.id.rb_send_courier)
         val btnSubmit: ConstraintLayout = findViewById(R.id.cl_btn_submit)
+        val btnSubmitText: TextView = findViewById(R.id.btn_send_text)
 
         storageReference = FirebaseStorage.getInstance().reference
 
@@ -129,6 +132,10 @@ class DonationSendActivity : AppCompatActivity() {
             when (resource) {
                 is Resource.Loading -> {
                     // Show loading indicator
+                    Toast.makeText(this, "Saving data...", Toast.LENGTH_SHORT).show()
+                    btnSubmitText.text = "Saving..."
+                    btnSubmitText.setTextColor(R.color.text)
+                    btnSubmitText.setBackgroundResource(R.drawable.button_neutral_rounded_corner)
                 }
                 is Resource.Success -> {
                     Toast.makeText(this, "Confirmation submitted successfully", Toast.LENGTH_SHORT).show()

@@ -1,5 +1,6 @@
 package com.example.helphandv10
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
@@ -70,6 +71,7 @@ class CreateFragment : Fragment() {
         const val IMAGE_PICK_CODE = 1000
     }
 
+    @SuppressLint("ResourceAsColor")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -79,6 +81,7 @@ class CreateFragment : Fragment() {
         val et_needs = view.findViewById<EditText>(R.id.et_create_needs)
         val cl_image = view.findViewById<ConstraintLayout>(R.id.cl_create_image)
         val btn_create = view.findViewById<ConstraintLayout>(R.id.cl_btn_create)
+        val btn_create_text = view.findViewById<TextView>(R.id.btn_create_text)
 
         val initialMarginBottom = resources.getDimensionPixelSize(R.dimen.m3_bottom_nav_min_height)
         val additionalMargin = (48 * resources.displayMetrics.density + 0.5f).toInt()
@@ -126,6 +129,10 @@ class CreateFragment : Fragment() {
             }
 
             if (::imageUri.isInitialized) {
+                btn_create_text.text = "Saving..."
+                btn_create_text.setTextColor(R.color.text)
+                btn_create.setBackgroundResource(R.drawable.button_neutral_rounded_corner)
+
                 val imageRef = storageReference.child("donations/${UUID.randomUUID()}")
                 imageRef.putFile(imageUri).addOnSuccessListener { taskSnapshot ->
                     imageRef.downloadUrl.addOnSuccessListener { uri ->
@@ -145,6 +152,7 @@ class CreateFragment : Fragment() {
 
                         addViewModel.donationAdded.observe(viewLifecycleOwner) {
                             if (it) {
+                                Toast.makeText(context, "Successfully saved data", Toast.LENGTH_SHORT).show()
                                 val intent = Intent(requireContext(), SuccessCreateDonation::class.java)
                                 intent.putExtra("DONATION", donation)
                                 if (donation != null) {

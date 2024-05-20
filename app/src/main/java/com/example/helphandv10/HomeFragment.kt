@@ -17,6 +17,7 @@ import com.example.helphandv10.adapter.ListAdapter
 import com.example.helphandv10.databinding.FragmentHomeBinding
 import com.example.helphandv10.model.Donations
 import com.example.helphandv10.viewmodel.donation.ListViewModel
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -100,6 +101,10 @@ class HomeFragment : Fragment() {
 
             // Jalankan transaksi
             transaction.commit()
+
+            // Mengubah item terpilih di BottomNavigationView
+            val bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.nav_bottom)
+            bottomNav.selectedItemId = R.id.nav_item_create
         }
 
         val iv_userPhoto = view.findViewById<ImageView>(R.id.iv_userPhotoProfile)

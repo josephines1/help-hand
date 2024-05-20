@@ -1,5 +1,6 @@
 package com.example.helphandv10.activity
 
+import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.net.Uri
@@ -38,6 +39,7 @@ class DonationUpdateActivity : AppCompatActivity() {
     private lateinit var storageReference: StorageReference
     private lateinit var imageUri: Uri
 
+    @SuppressLint("ResourceAsColor")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -64,6 +66,7 @@ class DonationUpdateActivity : AppCompatActivity() {
         val et_location = findViewById<EditText>(R.id.et_update_location)
         val et_items = findViewById<EditText>(R.id.et_update_items)
         val btn_update = findViewById<ConstraintLayout>(R.id.cl_btn_update)
+        val btn_update_text = findViewById<TextView>(R.id.btn_update_text)
         val cl_upload_image = findViewById<ConstraintLayout>(R.id.cl_upload_image)
         val iv_preview = findViewById<ImageView>(R.id.iv_preview)
 
@@ -143,6 +146,10 @@ class DonationUpdateActivity : AppCompatActivity() {
 
             // if image changed
             if (currentDonation != null) {
+                btn_update_text.text = "Saving..."
+                btn_update_text.setTextColor(R.color.text)
+                btn_update.setBackgroundResource(R.drawable.button_neutral_rounded_corner)
+
                 if (::imageUri.isInitialized) {
 
                     if (currentDonation.donationImageUrl != null) {
@@ -179,6 +186,7 @@ class DonationUpdateActivity : AppCompatActivity() {
 
                             updateViewModel.donationUpdated.observe(this) {
                                 if (it) {
+                                    Toast.makeText(this, "Successfully saved data", Toast.LENGTH_SHORT).show()
                                     val intent = Intent(this, ManageDonationActivity::class.java)
                                     intent.putExtra("DONATION", donationInput)
                                     startActivity(intent)
@@ -202,6 +210,7 @@ class DonationUpdateActivity : AppCompatActivity() {
 
                     updateViewModel.donationUpdated.observe(this) {
                         if (it) {
+                            Toast.makeText(this, "Successfully saved data", Toast.LENGTH_SHORT).show()
                             val intent = Intent(this, ManageDonationActivity::class.java)
                             intent.putExtra("DONATION", donationInput)
                             startActivity(intent)
