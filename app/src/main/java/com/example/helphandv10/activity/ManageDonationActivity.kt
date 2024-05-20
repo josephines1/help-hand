@@ -16,6 +16,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.helphandv10.HistoryFragment
 import com.example.helphandv10.R
 import com.example.helphandv10.adapter.ItemNeededAdapter
 import com.example.helphandv10.model.Donations
@@ -147,6 +148,11 @@ class ManageDonationActivity<Button> : AppCompatActivity() {
                     deleteViewModel.delete(it)
 
                     dialog.dismiss()
+
+                    val intent = Intent(this, MainActivity::class.java).apply {
+                        putExtra("showHistoryFragment", true)
+                    }
+                    startActivity(intent)
                     finish()
                 }
             }
