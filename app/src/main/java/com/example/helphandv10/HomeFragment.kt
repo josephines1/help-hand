@@ -107,6 +107,32 @@ class HomeFragment : Fragment() {
             bottomNav.selectedItemId = R.id.nav_item_create
         }
 
+        val btn_to_search = view.findViewById<ConstraintLayout>(R.id.cl_btn_home_search)
+
+        btn_to_search.setOnClickListener {
+            // Buat instance dari fragment Search
+            val searchFragment = SearchFragment()
+
+            // Dapatkan instance FragmentManager
+            val fragmentManager = requireActivity().supportFragmentManager
+
+            // Mulai transaksi fragment
+            val transaction = fragmentManager.beginTransaction()
+
+            // Ganti fragment Home dengan fragment Search
+            transaction.replace(R.id.fragment_container, searchFragment)
+
+            // Tambahkan transaksi ke back stack (jika ingin kembali ke fragment sebelumnya saat tombol back ditekan)
+            transaction.addToBackStack(null)
+
+            // Jalankan transaksi
+            transaction.commit()
+
+            // Mengubah item terpilih di BottomNavigationView
+            val bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.nav_bottom)
+            bottomNav.selectedItemId = R.id.nav_item_search
+        }
+
         val iv_userPhoto = view.findViewById<ImageView>(R.id.iv_userPhotoProfile)
         val tv_username = view.findViewById<TextView>(R.id.tv_username)
 

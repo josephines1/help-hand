@@ -11,6 +11,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
+import java.util.Calendar
 
 class DonationRepository(
     private val firestoreDb: FirebaseFirestore
@@ -28,8 +29,23 @@ class DonationRepository(
     }
 
     fun getDonation(): Flow<List<Donations>> = flow {
+        val firestoreDb = FirebaseFirestore.getInstance()
         val ref = firestoreDb.collection("Donations")
-        val querySnapshot = ref.get().await()
+
+        // Dapatkan waktu saat ini (hari ini) tanpa waktu (jam, menit, detik)
+        val calendar = Calendar.getInstance()
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+        val today = calendar.time
+
+        // Konversi 'today' ke Timestamp
+        val todayTimestamp = Timestamp(today)
+
+        // Ambil data dengan filter deadline >= hari ini
+        val querySnapshot = ref.whereGreaterThanOrEqualTo("deadline", todayTimestamp).get().await()
+
         if (!querySnapshot.isEmpty) {
             emit(querySnapshot.toObjects(Donations::class.java))
         }
@@ -167,6 +183,46 @@ class DonationRepository(
             emit(Resource.Success(donorDocuments))
         } catch (e: Exception) {
             emit(Resource.Error(e.localizedMessage ?: "Error fetching donors"))
+        }
+    }
+
+    fun searchDonationsByTitle(keyword: String): Flow<List<Donations>> = flow {
+        try {
+            val ref = firestoreDb.collection("Donations")
+
+            val calendar = Calendar.getInstance()
+            calendar.set(Calendar.HOUR_OF_DAY, 0)
+            calendar.set(Calendar.MINUTE, 0)
+            calendar.set(Calendar.SECOND, 0)
+            calendar.set(Calendar.MILLISECOND, 0)
+            val today = calendar.time
+
+            val todayTimestamp = Timestamp(today)
+
+            val querySnapshot = if (keyword.isEmpty()) {
+                ref.whereGreaterThanOrEqualTo("deadline", todayTimestamp).get().await()
+            } else {
+                ref.whereGreaterThanOrEqualTo("title", keyword)
+                    .whereLessThanOrEqualTo("title", keyword + '\uf8ff')
+                    .whereGreaterThanOrEqualTo("deadline", todayTimestamp)
+                    .get().await()
+            }
+
+            if (!querySnapshot.isEmpty) {
+                val donations = querySnapshot.toObjects(Donations::class.java)
+                Log.d("DonationRepository", "Found ${donations.size} donations")
+                emit(donations)
+            } else {
+                Log.d("DonationRepository", "No donations found")
+                emit(emptyList<Donations>())
+            }
+        } catch (e: Exception) {
+            if (e.message?.contains("FAILED_PRECONDITION") == true) {
+                Log.e("DonationRepository", "Indeks komposit diperlukan. Buat indeks komposit di Firebase Console.")
+            } else {
+                Log.e("DonationRepository", "Error searching donations by title: ${e.message}", e)
+            }
+            emit(emptyList<Donations>())
         }
     }
 }
