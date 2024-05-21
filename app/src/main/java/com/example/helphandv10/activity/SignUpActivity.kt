@@ -15,15 +15,43 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
+import java.security.SecureRandom
+import java.security.spec.KeySpec
+import javax.crypto.SecretKey
+import javax.crypto.SecretKeyFactory
+import javax.crypto.spec.PBEKeySpec
 
 class SignUpActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     lateinit var tv_alreadyRegistered : TextView
 
+    private val ALGORITHM = "PBKDF2WithHmacSHA512"
+    private val ITERATIONS = 120_000
+    private val KEY_LENGTH = 256
+    private val SECRET = "SomeRandomSecret"
+
+    fun generateRandomSalt(): ByteArray {
+        val random = SecureRandom()
+        val salt = ByteArray(16)
+        random.nextBytes(salt)
+        return salt
+    }
+
+    @OptIn(ExperimentalStdlibApi::class)
+    fun generateHash(password: String, salt: String): String {
+        val combinedSalt = "$salt$SECRET".toByteArray()
+        val factory: SecretKeyFactory = SecretKeyFactory.getInstance(ALGORITHM)
+        val spec: KeySpec = PBEKeySpec(password.toCharArray(), combinedSalt, ITERATIONS, KEY_LENGTH)
+        val key: SecretKey = factory.generateSecret(spec)
+        val hash: ByteArray = key.encoded
+        return hash.toHexString()
+    }
+
     private fun initComponents() {
         tv_alreadyRegistered = findViewById(R.id.tv_alreadyRegistered)
     }
 
+    @OptIn(ExperimentalStdlibApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_up)
@@ -64,11 +92,15 @@ class SignUpActivity : AppCompatActivity() {
                     val uid = firebaseUser?.uid
 
                     if (uid != null) {
+                        val randomSalt = generateRandomSalt()
+                        val randomSaltString = randomSalt.toHexString()
+                        val hashedPassword = generateHash(password, randomSaltString)
+
                         // Buat objek User dengan informasi pengguna
                         val user = Users(
                             username = signUpUsername.text.toString(),
                             email = signUpEmail.text.toString(),
-                            password = signUpPass.text.toString(),
+                            password = hashedPassword,
                             phoneNumber = "-",
                             photoProfileURL = "-"
                         )

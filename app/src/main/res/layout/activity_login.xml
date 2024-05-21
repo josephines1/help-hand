@@ -8,143 +8,162 @@
     android:background="@color/background"
     tools:context=".activity.LoginActivity">
 
-    <ImageView
-        android:id="@+id/iv_loginCircle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/vector_circle" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/linearLayout_appName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/iv_loginCircle">
-
-        <TextView
-            android:id="@+id/tv_appName1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/app_name1"
-            android:textColor="@color/secondary"
-            android:textSize="20sp"
-            android:fontFamily="@font/recursive_casual_black" />
-
-        <TextView
-            android:id="@+id/tv_appName2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/app_name2"
-            android:textColor="@color/primary"
-            android:textSize="20sp"
-            android:fontFamily="@font/recursive_casual_black" />
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/tv_loginTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/login_title"
-        android:textSize="35sp"
-        android:fontFamily="@font/poppins_bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout_appName" />
-
-    <TextView
-        android:id="@+id/tv_loginSubtitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/login_subtitle"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_loginTitle" />
-
-    <ImageView
-        android:id="@+id/iv_loginIllustration"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_loginSubtitle"
-        app:srcCompat="@drawable/illustration_login"
-        android:contentDescription="Login Illustration" />
-
-    <LinearLayout
-        android:id="@+id/linearLayout_loginForm"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="1dp"
-        android:layout_marginTop="1dp"
-        android:layout_marginEnd="1dp"
-        android:orientation="vertical"
-        android:paddingHorizontal="32dp"
-        android:paddingVertical="12dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/iv_loginIllustration">
-
-        <EditText
-            android:id="@+id/et_create_title"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/edit_text_rounded_corner"
-            android:ems="10"
-            android:hint="@string/login_email_hint"
-            android:inputType="text"
-            android:padding="16dp"
-            android:paddingStart="24dp"
-            android:paddingEnd="24dp"
-            android:textSize="14sp" />
+            android:orientation="vertical" >
 
-        <EditText
-            android:id="@+id/et_loginPassword"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/edit_text_rounded_corner"
-            android:ems="10"
-            android:hint="@string/login_password_hint"
-            android:inputType="textPassword"
-            android:padding="16dp"
-            android:paddingStart="24dp"
-            android:paddingEnd="24dp"
-            android:textSize="14sp" />
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-        <Button
-            android:id="@+id/btn_login"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:padding="12dp"
-            android:text="@string/login_title"
-            android:textColor="@color/white"
-            android:textStyle="bold"
-            android:textSize="16sp"
-            android:background="@drawable/button_primary_rounded_corner" />
+                <ImageView
+                    android:id="@+id/iv_loginCircle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/vector_circle" />
 
-    </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/linearLayout_appName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:orientation="horizontal"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/iv_loginCircle">
 
-    <TextView
-        android:id="@+id/tv_doNotHaveAnAccount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="@string/login_doNotHaveAnAccount"
-        android:textSize="12sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout_loginForm" />
+                    <TextView
+                        android:id="@+id/tv_appName1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/app_name1"
+                        android:textColor="@color/secondary"
+                        android:textSize="20sp"
+                        android:fontFamily="@font/recursive_casual_black" />
+
+                    <TextView
+                        android:id="@+id/tv_appName2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/app_name2"
+                        android:textColor="@color/primary"
+                        android:textSize="20sp"
+                        android:fontFamily="@font/recursive_casual_black" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tv_loginTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/login_title"
+                    android:textSize="35sp"
+                    android:fontFamily="@font/poppins_bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/linearLayout_appName" />
+
+                <TextView
+                    android:id="@+id/tv_loginSubtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/login_subtitle"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_loginTitle" />
+
+                <ImageView
+                    android:id="@+id/iv_loginIllustration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_loginSubtitle"
+                    app:srcCompat="@drawable/illustration_login"
+                    android:contentDescription="Login Illustration" />
+
+                <LinearLayout
+                    android:id="@+id/linearLayout_loginForm"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="1dp"
+                    android:layout_marginTop="1dp"
+                    android:layout_marginEnd="1dp"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="32dp"
+                    android:paddingVertical="12dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/iv_loginIllustration">
+
+                    <EditText
+                        android:id="@+id/et_create_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:background="@drawable/edit_text_rounded_corner"
+                        android:ems="10"
+                        android:hint="@string/login_email_hint"
+                        android:inputType="text"
+                        android:padding="16dp"
+                        android:paddingStart="24dp"
+                        android:paddingEnd="24dp"
+                        android:textSize="14sp" />
+
+                    <EditText
+                        android:id="@+id/et_loginPassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:background="@drawable/edit_text_rounded_corner"
+                        android:ems="10"
+                        android:hint="@string/login_password_hint"
+                        android:inputType="textPassword"
+                        android:padding="16dp"
+                        android:paddingStart="24dp"
+                        android:paddingEnd="24dp"
+                        android:textSize="14sp" />
+
+                    <Button
+                        android:id="@+id/btn_login"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="24dp"
+                        android:padding="12dp"
+                        android:text="@string/login_title"
+                        android:textColor="@color/white"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:background="@drawable/button_primary_rounded_corner" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tv_doNotHaveAnAccount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:paddingBottom="12dp"
+                    android:text="@string/login_doNotHaveAnAccount"
+                    android:textSize="12sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/linearLayout_loginForm" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </LinearLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
