@@ -13,13 +13,4 @@
     </style>
 
     <style name="Theme.HelpHandv10" parent="Base.Theme.HelpHandv10" />
-
-    <style name="Theme.HelpHandv10.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
-
-    <style name="Theme.HelpHandv10.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
-    <style name="Theme.HelpHandv10.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>

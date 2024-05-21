@@ -2,14 +2,13 @@ package com.example.helphandv10
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,7 +19,6 @@ import com.example.helphandv10.data.DonationRepository
 import com.example.helphandv10.model.Donations
 import com.example.helphandv10.viewmodel.donation.HistoryViewModel
 import com.example.helphandv10.viewmodel.donation.HistoryViewModelFactory
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 
@@ -72,14 +70,10 @@ class HistoryFragment : Fragment() {
         tvAsOrganizer = view.findViewById(R.id.tv_as_organizer)
         tvNoData = view.findViewById(R.id.tvNoData)
 
-        showAsOrganizer = arguments?.getBoolean("showAsOrganizer", false) ?: false
-        Log.d("Show As Organizer", showAsOrganizer.toString())
-        if(showAsOrganizer) {
-            updateTextViewColors()
-        }
+        setupAdapter()
 
         val initialPaddingBottom = resources.getDimensionPixelSize(R.dimen.m3_bottom_nav_min_height)
-        val additionalPadding = (48 * resources.displayMetrics.density + 0.5f).toInt()
+        val additionalPadding = (32 * resources.displayMetrics.density + 0.5f).toInt()
         val newPaddingBottom = initialPaddingBottom + additionalPadding
         recyclerView.setPadding(recyclerView.paddingLeft, recyclerView.paddingTop, recyclerView.paddingRight, newPaddingBottom)
 
@@ -88,7 +82,7 @@ class HistoryFragment : Fragment() {
         val factory = HistoryViewModelFactory(donationRepository)
         donationViewModel = ViewModelProvider(this, factory).get(HistoryViewModel::class.java)
 
-        setupAdapter()
+        // Initial data load
         loadData()
 
         // Set up the listener for the TextView tv_as_organizer

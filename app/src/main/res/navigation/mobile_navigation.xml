@@ -30,4 +30,5 @@
         android:name="com.example.helphandv10.ProfileFragment"
         android:label="PROFILE"
         tools:layout="@layout/fragment_profile" />
+
 </navigation>
