@@ -16,7 +16,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-class ListAdapter(private val context: Context?, val donation: List<Donations>) : RecyclerView.Adapter<ListAdapter.ViewHolder>() {
+class ListAdapter(private val context: Context?, var donation: List<Donations>) : RecyclerView.Adapter<ListAdapter.ViewHolder>() {
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val imageView: ImageView = itemView.findViewById(R.id.iv_item_image)
         val title: TextView = itemView.findViewById(R.id.tv_item_title)
@@ -36,7 +36,7 @@ class ListAdapter(private val context: Context?, val donation: List<Donations>) 
         val item = donation[position]
 
         holder.title.text = item.title
-        holder.date.text = "Deadline: ${formatTimestamp(item.deadline)}"
+        holder.date.text = "Deadline: ${item.deadline?.let { formatTimestamp(it) }}"
 
         Glide.with(holder.itemView.context)
             .load(item.donationImageUrl)
@@ -56,6 +56,11 @@ class ListAdapter(private val context: Context?, val donation: List<Donations>) 
         val localDateTime = timestamp.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
         // Menggunakan DateTimeFormatter untuk memformat LocalDateTime
         return localDateTime.format(formatter)
+    }
+
+    fun updateData(newDonations: List<Donations>) {
+        donation = newDonations
+        notifyDataSetChanged()
     }
 
 }

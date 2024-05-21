@@ -36,7 +36,7 @@ class DonationAdapter(private val isAsOrganizer: Boolean) : ListAdapter<Donation
 
         fun bind(donation: Donations) {
             titleTextView.text = donation.title
-            deadlineTextView.text = "Deadline: ${formatTimestamp(donation.deadline)}"
+            deadlineTextView.text = "Deadline: ${donation.deadline?.let { formatTimestamp(it) }}"
             Glide.with(itemView.context)
                 .load(donation.donationImageUrl)
                 .centerCrop()

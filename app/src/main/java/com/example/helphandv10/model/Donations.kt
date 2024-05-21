@@ -18,7 +18,7 @@ data class Donations(
     val donationImageUrl: String,
     val location: String,
     val organizerId: String,
-    val deadline: Timestamp,
+    val deadline: Timestamp? = null,
     val itemsNeeded: List<String>,
     val donors: Map<String, DonorConfirmation>? = null // Map dari UserID ke DonorConfirmation
 ): Parcelable {
