@@ -43,7 +43,7 @@ class DonorsAdapter(
 
     override fun getItemCount() = donors.size
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("SetTextI18n", "ResourceAsColor")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val donorSnapshot = donors[position]
         val userId = donorSnapshot.id
@@ -79,18 +79,20 @@ class DonorsAdapter(
         }
 
         val data = donorSnapshot.data ?: return
-        val confirmation = data["confirmation"] as? Map<*, *>
-        val shippingConfirmation = data["shippingConfirmation"] as? Map<*, *>
+        val sentConfirmation = data["sentConfirmation"] as? Map<*, *>
+        val receivedConfirmation = data["receivedConfirmation"] as? Map<*, *>
 
-        val requestText = if (confirmation != null && shippingConfirmation != null) {
-            val expectedArrival = shippingConfirmation["expectedArrival"] as? Timestamp
-            "Verify Arrival on ${expectedArrival?.let { formatTimestamp(it) } ?: ""}"
+        val requestText = if (sentConfirmation != null && receivedConfirmation != null) {
+            val confirmationDate = receivedConfirmation["confirmationDate"] as? Timestamp
+            "Received on ${confirmationDate?.let { formatTimestamp(it) } ?: ""}"
+
+            holder.tv_request.setTextColor(R.color.secondary)
         } else {
-            val plannedShippingDate = confirmation?.get("plannedShippingDate") as? Timestamp
-            "Confirm Delivery on ${plannedShippingDate?.let { formatTimestamp(it) } ?: ""}"
+            val expectedArrival = sentConfirmation?.get("expectedArrival") as? Timestamp
+            "Estimated arrival date: ${expectedArrival?.let { formatTimestamp(it) } ?: ""}"
         }
 
-        holder.tv_request.text = requestText
+        holder.tv_request.text = requestText.toString()
     }
 
     private fun formatTimestamp(timestamp: Timestamp): String {

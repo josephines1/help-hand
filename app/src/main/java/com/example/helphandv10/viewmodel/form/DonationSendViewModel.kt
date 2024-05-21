@@ -19,12 +19,13 @@ class DonationSendViewModel(private val donationRepository: DonationRepository) 
         userId: String,
         donationId: String,
         message: String,
-        deliveryDate: Timestamp,
+        expectedArrival: Timestamp,
         donationItemImageUrl: String,
-        deliveryMethod: String
+        deliveryMethod: String,
+        items: List<String>
     ) {
         viewModelScope.launch {
-            donationRepository.saveDonationConfirmation(userId, donationId, message, deliveryDate, donationItemImageUrl, deliveryMethod)
+            donationRepository.saveDonationConfirmation(userId, donationId, message, expectedArrival, donationItemImageUrl, deliveryMethod, items)
                 .collect {
                     _saveConfirmationStatus.postValue(it)
                 }

@@ -23,9 +23,7 @@ import androidx.lifecycle.Observer
 import com.example.helphandv10.CreateFragment
 import com.example.helphandv10.R
 import com.example.helphandv10.data.DonationRepository
-import com.example.helphandv10.model.DonationConfirmation
 import com.example.helphandv10.model.Donations
-import com.example.helphandv10.model.DonorConfirmation
 import com.example.helphandv10.utils.Resource
 import com.example.helphandv10.viewmodel.form.DonationSendViewModel
 import com.example.helphandv10.viewmodel.form.DonationSendViewModelFactory
@@ -69,6 +67,7 @@ class DonationSendActivity : AppCompatActivity() {
 
         val etMessage: EditText = findViewById(R.id.et_send_message)
         val etDeliveryDate: EditText = findViewById(R.id.et_send_date)
+        val etItems: EditText = findViewById(R.id.et_send_items)
         val ivPreview: ImageView = findViewById(R.id.iv_preview)
         val cl_image: ConstraintLayout = findViewById(R.id.cl_image)
         val rgDeliveryMethod: RadioGroup = findViewById(R.id.rg_send_delivery_method)
@@ -101,8 +100,9 @@ class DonationSendActivity : AppCompatActivity() {
                 null
             }
             val deliveryMethod = if (rbDropOff.isChecked) "Drop Off" else "Courier"
+            val items = etItems.text.toString().split(",").map { it.trim() }
 
-            if (message.isEmpty() || deliveryDate == null) {
+            if (message.isEmpty() || items.isEmpty() || deliveryDate == null) {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -113,7 +113,7 @@ class DonationSendActivity : AppCompatActivity() {
                     imageRef.downloadUrl.addOnSuccessListener { uri ->
                         val donationItemImageUrl = uri.toString()
                         Log.d("DonationSendActivity", "Image URL: $donationItemImageUrl")
-                        saveDonation(message, Timestamp(deliveryDate), deliveryMethod, donationItemImageUrl, donation)
+                        saveDonation(message, Timestamp(deliveryDate), deliveryMethod, donationItemImageUrl, donation, items)
                     }.addOnFailureListener {
                         Toast.makeText(this, "Failed to get image URL", Toast.LENGTH_SHORT).show()
                         Log.d("DonationSendActivity", "Failed to get image URL")
@@ -135,7 +135,7 @@ class DonationSendActivity : AppCompatActivity() {
                     Toast.makeText(this, "Saving data...", Toast.LENGTH_SHORT).show()
                     btnSubmitText.text = "Saving..."
                     btnSubmitText.setTextColor(R.color.text)
-                    btnSubmitText.setBackgroundResource(R.drawable.button_neutral_rounded_corner)
+                    btnSubmit.setBackgroundResource(R.drawable.button_neutral_rounded_corner)
                 }
                 is Resource.Success -> {
                     Toast.makeText(this, "Confirmation submitted successfully", Toast.LENGTH_SHORT).show()
@@ -157,7 +157,7 @@ class DonationSendActivity : AppCompatActivity() {
         }
     }
 
-    private fun saveDonation(message: String, deliveryDate: Timestamp, deliveryMethod: String, donationItemImageUrl: String, donation: Donations?) {
+    private fun saveDonation(message: String, deliveryDate: Timestamp, deliveryMethod: String, donationItemImageUrl: String, donation: Donations?, items: List<String>) {
         val donationId = donation?.id
         val userId = auth.currentUser?.uid
 
@@ -166,7 +166,7 @@ class DonationSendActivity : AppCompatActivity() {
         Log.d("DonationSendActivity", "Donation Image URL: $donationItemImageUrl")
 
         if (userId != null && donationId != null) {
-            donationViewModel.saveDonationConfirmation(userId, donationId, message, deliveryDate, donationItemImageUrl, deliveryMethod)
+            donationViewModel.saveDonationConfirmation(userId, donationId, message, deliveryDate, donationItemImageUrl, deliveryMethod, items)
         } else {
             Log.d("DonationSendActivity", "Failed to save confirmation: userId or donationId is null")
             Toast.makeText(this, "Failed to save confirmation", Toast.LENGTH_SHORT).show()

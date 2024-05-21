@@ -2,7 +2,6 @@ package com.example.helphandv10.data
 
 import android.util.Log
 import com.example.helphandv10.model.Donations
-import com.example.helphandv10.model.DonorConfirmation
 import com.example.helphandv10.utils.Resource
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
@@ -61,7 +60,7 @@ class DonationRepository(
                     "title" to donation.title,
                     "donationImageUrl" to imageUrl,
                     "location" to donation.location,
-                    "organizer" to donation.organizerId,
+                    "organizerId" to donation.organizerId,
                     "deadline" to donation.deadline,
                     "itemsNeeded" to donation.itemsNeeded,
                     "donors" to donation.donors,
@@ -145,19 +144,21 @@ class DonationRepository(
         userId: String,
         donationId: String,
         message: String,
-        deliveryDate: Timestamp,
+        expectedArrival: Timestamp,
         donationItemImageUrl: String,
-        deliveryMethod: String
+        deliveryMethod: String,
+        items: List<String>
     ): Flow<Resource<Unit>> = flow {
         val confirmationData = hashMapOf(
             "message" to message,
-            "plannedShippingDate" to deliveryDate,
+            "expectedArrival" to expectedArrival,
             "donationItemImageUrl" to donationItemImageUrl,
-            "shippingMethod" to deliveryMethod
+            "shippingMethod" to deliveryMethod,
+            "items" to items
         )
 
         val dataToSave = hashMapOf(
-            "confirmation" to confirmationData
+            "sentConfirmation" to confirmationData
         )
 
         val donationRef = firestoreDb.collection("Donations").document(donationId)
@@ -183,46 +184,6 @@ class DonationRepository(
             emit(Resource.Success(donorDocuments))
         } catch (e: Exception) {
             emit(Resource.Error(e.localizedMessage ?: "Error fetching donors"))
-        }
-    }
-
-    fun searchDonationsByTitle(keyword: String): Flow<List<Donations>> = flow {
-        try {
-            val ref = firestoreDb.collection("Donations")
-
-            val calendar = Calendar.getInstance()
-            calendar.set(Calendar.HOUR_OF_DAY, 0)
-            calendar.set(Calendar.MINUTE, 0)
-            calendar.set(Calendar.SECOND, 0)
-            calendar.set(Calendar.MILLISECOND, 0)
-            val today = calendar.time
-
-            val todayTimestamp = Timestamp(today)
-
-            val querySnapshot = if (keyword.isEmpty()) {
-                ref.whereGreaterThanOrEqualTo("deadline", todayTimestamp).get().await()
-            } else {
-                ref.whereGreaterThanOrEqualTo("title", keyword)
-                    .whereLessThanOrEqualTo("title", keyword + '\uf8ff')
-                    .whereGreaterThanOrEqualTo("deadline", todayTimestamp)
-                    .get().await()
-            }
-
-            if (!querySnapshot.isEmpty) {
-                val donations = querySnapshot.toObjects(Donations::class.java)
-                Log.d("DonationRepository", "Found ${donations.size} donations")
-                emit(donations)
-            } else {
-                Log.d("DonationRepository", "No donations found")
-                emit(emptyList<Donations>())
-            }
-        } catch (e: Exception) {
-            if (e.message?.contains("FAILED_PRECONDITION") == true) {
-                Log.e("DonationRepository", "Indeks komposit diperlukan. Buat indeks komposit di Firebase Console.")
-            } else {
-                Log.e("DonationRepository", "Error searching donations by title: ${e.message}", e)
-            }
-            emit(emptyList<Donations>())
         }
     }
 }

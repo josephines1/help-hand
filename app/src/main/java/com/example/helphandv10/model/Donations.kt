@@ -20,7 +20,7 @@ data class Donations(
     val organizerId: String,
     val deadline: Timestamp? = null,
     val itemsNeeded: List<String>,
-    val donors: Map<String, DonorConfirmation>? = null // Map dari UserID ke DonorConfirmation
+    val donors: Map<String, Donor>? = null // Map dari UserID ke DonorConfirmation
 ): Parcelable {
     constructor() : this(
         id = null,
@@ -71,7 +71,7 @@ data class Donations(
 
             // Jika hasDonors bernilai true, maka baca dan konversi donors dari Bundle
             val donors = if (hasDonors) {
-                (donorsBundle?.getSerializable("donors") as? Map<String, DonorConfirmation>)?.toMutableMap()
+                (donorsBundle?.getSerializable("donors") as? Map<String, Donor>)?.toMutableMap()
             } else {
                 null
             }
@@ -90,78 +90,81 @@ data class Donations(
     }
 }
 
-data class DonorConfirmation(
-    val confirmation: DonationConfirmation,
-    val shippingConfirmation: ShippingConfirmation
+data class Donor(
+    val sentConfirmation: SentConfirmation,
+    val receivedConfirmation: ReceivedConfirmation
 ): Parcelable {
     constructor(parcel: Parcel) : this(
-        parcel.readParcelable(DonationConfirmation::class.java.classLoader)!!,
-        parcel.readParcelable(ShippingConfirmation::class.java.classLoader)!!
+        parcel.readParcelable(SentConfirmation::class.java.classLoader)!!,
+        parcel.readParcelable(ReceivedConfirmation::class.java.classLoader)!!
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeParcelable(confirmation, flags)
-        parcel.writeParcelable(shippingConfirmation, flags)
+        parcel.writeParcelable(sentConfirmation, flags)
+        parcel.writeParcelable(receivedConfirmation, flags)
     }
 
     override fun describeContents(): Int {
         return 0
     }
 
-    companion object CREATOR : Parcelable.Creator<DonorConfirmation> {
-        override fun createFromParcel(parcel: Parcel): DonorConfirmation {
-            return DonorConfirmation(parcel)
+    companion object CREATOR : Parcelable.Creator<Donor> {
+        override fun createFromParcel(parcel: Parcel): Donor {
+            return Donor(parcel)
         }
 
-        override fun newArray(size: Int): Array<DonorConfirmation?> {
+        override fun newArray(size: Int): Array<Donor?> {
             return arrayOfNulls(size)
         }
     }
 }
 
-data class DonationConfirmation(
+data class SentConfirmation(
     val message: String,
-    val plannedShippingDate: Timestamp,
+    val expectedArrival: Timestamp,
     val donationItemImageUrl: String,
-    val shippingMethod: String
+    val shippingMethod: String,
+    val items: List<String>
 ): Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString()!!,
         parcel.readParcelable(Timestamp::class.java.classLoader)!!,
         parcel.readString()!!,
-        parcel.readString()!!
+        parcel.readString()!!,
+        parcel.createStringArrayList()!!
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(message)
-        parcel.writeParcelable(plannedShippingDate, flags)
+        parcel.writeParcelable(expectedArrival, flags)
         parcel.writeString(donationItemImageUrl)
         parcel.writeString(shippingMethod)
+        parcel.writeStringList(items)
     }
 
     override fun describeContents(): Int {
         return 0
     }
 
-    companion object CREATOR : Parcelable.Creator<DonationConfirmation> {
-        override fun createFromParcel(parcel: Parcel): DonationConfirmation {
-            return DonationConfirmation(parcel)
+    companion object CREATOR : Parcelable.Creator<SentConfirmation> {
+        override fun createFromParcel(parcel: Parcel): SentConfirmation {
+            return SentConfirmation(parcel)
         }
 
-        override fun newArray(size: Int): Array<DonationConfirmation?> {
+        override fun newArray(size: Int): Array<SentConfirmation?> {
             return arrayOfNulls(size)
         }
     }
 }
 
-data class ShippingConfirmation(
+data class ReceivedConfirmation(
+    val confirmationDate: Timestamp,
     val message: String,
-    val expectedArrival: Timestamp,
-    val shippingProofImageUrl: String
+    val receivedProofImageUrl: String
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
-        parcel.readString()!!,
         parcel.readParcelable(Timestamp::class.java.classLoader)!!,
+        parcel.readString()!!,
         parcel.readString()!!
     ) {
     }
@@ -171,17 +174,17 @@ data class ShippingConfirmation(
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeParcelable(confirmationDate, flags)
         parcel.writeString(message)
-        parcel.writeParcelable(expectedArrival, flags)
-        parcel.writeString(shippingProofImageUrl)
+        parcel.writeString(receivedProofImageUrl)
     }
 
-    companion object CREATOR : Parcelable.Creator<ShippingConfirmation> {
-        override fun createFromParcel(parcel: Parcel): ShippingConfirmation {
-            return ShippingConfirmation(parcel)
+    companion object CREATOR : Parcelable.Creator<ReceivedConfirmation> {
+        override fun createFromParcel(parcel: Parcel): ReceivedConfirmation {
+            return ReceivedConfirmation(parcel)
         }
 
-        override fun newArray(size: Int): Array<ShippingConfirmation?> {
+        override fun newArray(size: Int): Array<ReceivedConfirmation?> {
             return arrayOfNulls(size)
         }
     }
