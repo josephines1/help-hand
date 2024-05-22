@@ -48,7 +48,7 @@ class ManageDonorsActivity : AppCompatActivity() {
         setupRecyclerView()
 
         val donation: Donations? = intent.getParcelableExtra("DONATION")
-        val donationId = donation?.id
+        val donationId = donation?.id ?: intent.getStringExtra("DONATION_ID")
 
         if(donationId != null) {
             viewModel.fetchDonors(donationId)

@@ -1,6 +1,7 @@
 package com.example.helphandv10.adapter
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.helphandv10.R
 import com.example.helphandv10.activity.DonationDetailActivity
+import com.example.helphandv10.activity.DonationReceiveActivity
 import com.example.helphandv10.utils.Resource
 import com.example.helphandv10.viewmodel.form.ManageDonorsViewModel
 import com.google.firebase.firestore.DocumentSnapshot
@@ -64,6 +66,35 @@ class DonorsAdapter(
                             .placeholder(R.drawable.icon_placeholder_photo_profile_secondary)
                             .centerCrop()
                             .into(holder.iv_photo)
+
+                        val data = donorSnapshot.data ?: return@collect
+                        val sentConfirmation = data["sentConfirmation"] as? Map<*, *>
+                        val receivedConfirmation = data["receivedConfirmation"] as? Map<*, *>
+
+                        val requestText = if (sentConfirmation != null && receivedConfirmation != null) {
+                            val confirmationDate = receivedConfirmation["confirmationDate"] as? Timestamp
+                            "Received on ${confirmationDate?.let { formatTimestamp(it) } ?: ""}"
+                        } else {
+                            val expectedArrival = sentConfirmation?.get("expectedArrival") as? Timestamp
+                            "Estimated arrival date: ${expectedArrival?.let { formatTimestamp(it) } ?: ""}"
+                        }
+
+                        holder.tv_request.text = requestText
+
+                        if(sentConfirmation != null && receivedConfirmation == null) {
+                            // Tambahkan onClickListener pada item donor
+                            holder.itemView.setOnClickListener {
+                                val donationId = donorSnapshot.reference.parent.parent?.id
+                                val donorId = donorSnapshot.id
+
+                                val intent = Intent(context, DonationReceiveActivity::class.java)
+                                intent.putExtra("DONATION_ID", donationId)
+                                intent.putExtra("DONOR_ID", donorId)
+                                intent.putExtra("DONOR_NAME", username)
+                                context?.startActivity(intent)
+                                (context as? Activity)?.finish()
+                            }
+                        }
                     }
                     is Resource.Error -> {
                         // Handle error
@@ -77,22 +108,6 @@ class DonorsAdapter(
                 }
             }
         }
-
-        val data = donorSnapshot.data ?: return
-        val sentConfirmation = data["sentConfirmation"] as? Map<*, *>
-        val receivedConfirmation = data["receivedConfirmation"] as? Map<*, *>
-
-        val requestText = if (sentConfirmation != null && receivedConfirmation != null) {
-            val confirmationDate = receivedConfirmation["confirmationDate"] as? Timestamp
-            "Received on ${confirmationDate?.let { formatTimestamp(it) } ?: ""}"
-
-            holder.tv_request.setTextColor(R.color.secondary)
-        } else {
-            val expectedArrival = sentConfirmation?.get("expectedArrival") as? Timestamp
-            "Estimated arrival date: ${expectedArrival?.let { formatTimestamp(it) } ?: ""}"
-        }
-
-        holder.tv_request.text = requestText.toString()
     }
 
     private fun formatTimestamp(timestamp: Timestamp): String {

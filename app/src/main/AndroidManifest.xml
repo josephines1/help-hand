@@ -23,6 +23,9 @@
             android:name=".activity.DonationSendActivity"
             android:exported="false" />
         <activity
+            android:name=".activity.DonationReceiveActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.DonationUpdateActivity"
             android:exported="false" />
         <activity

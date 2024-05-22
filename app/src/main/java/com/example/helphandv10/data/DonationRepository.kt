@@ -2,11 +2,13 @@ package com.example.helphandv10.data
 
 import android.util.Log
 import com.example.helphandv10.model.Donations
+import com.example.helphandv10.model.Donor
 import com.example.helphandv10.utils.Resource
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
@@ -185,5 +187,31 @@ class DonationRepository(
         } catch (e: Exception) {
             emit(Resource.Error(e.localizedMessage ?: "Error fetching donors"))
         }
+    }
+
+    suspend fun updateDonation(donationId: String, donorId: String, updatedDonor: Donor): Flow<Resource<Unit>> = flow {
+        emit(Resource.Loading)
+        try {
+            val donationRef = firestoreDb.collection("Donations").document(donationId)
+            val donorRef = donationRef.collection("Donors").document(donorId)
+
+            donorRef.set(updatedDonor).await()
+
+            emit(Resource.Success(Unit))
+        } catch (e: Exception) {
+            emit(Resource.Error(e.localizedMessage ?: "Error updating donation"))
+        }
+    }
+
+    fun getDonorById(donationId: String, donorId: String, onSuccess: (DocumentSnapshot) -> Unit, onFailure: (Exception) -> Unit) {
+        val donorRef = firestoreDb.collection("Donations").document(donationId)
+            .collection("Donors").document(donorId)
+        donorRef.get()
+            .addOnSuccessListener { document ->
+                onSuccess(document)
+            }
+            .addOnFailureListener { exception ->
+                onFailure(exception)
+            }
     }
 }

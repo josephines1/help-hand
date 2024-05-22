@@ -5,16 +5,22 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.DonationSendActivity">
+    tools:context=".activity.DonationReceiveActivity" >
 
     <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/background"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:orientation="vertical"
+            android:paddingBottom="24dp" >
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -38,43 +44,12 @@
                     android:layout_gravity="center_horizontal"
                     android:layout_weight="1"
                     android:fontFamily="@font/poppins_medium"
-                    android:text="Delivery Confirmation"
+                    android:text="Receive Confirmation"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="@+id/ic_back"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginHorizontal="24dp"
-                android:layout_marginTop="24dp"
-                android:background="@drawable/background_banner_home"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="16dp">
-
-                <ImageView
-                    android:id="@+id/ic_info"
-                    android:layout_width="15dp"
-                    android:layout_height="15dp"
-                    android:src="@drawable/icon_info"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/tv_info"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Please fill out your donation delivery info in the form \nbelow"
-                    android:textSize="12sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="@id/ic_info"
                     app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -89,21 +64,20 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Messages" />
+                    android:text="Donatur" />
 
-                <EditText
-                    android:id="@+id/et_send_message"
+                <TextView
+                    android:id="@+id/tv_donatur"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/edit_text_rounded_corner"
+                    android:background="@drawable/edit_text_disabled_rounded_corner"
                     android:ems="10"
-                    android:hint="Message for your delivery (optional)"
-                    android:inputType="text"
+                    android:text="Donatur"
                     android:padding="16dp"
+                    android:fontFamily="@font/poppins_bold"
                     android:paddingStart="24dp"
                     android:paddingEnd="24dp"
                     android:textSize="14sp" />
-
             </LinearLayout>
 
             <LinearLayout
@@ -116,21 +90,144 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Estimated arrival date" />
+                    android:text="Message From Donatur" />
 
-                <EditText
-                    android:id="@+id/et_send_date"
+                <TextView
+                    android:id="@+id/tv_message_from_donatur"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/edit_text_rounded_corner"
+                    android:background="@drawable/edit_text_disabled_rounded_corner"
                     android:ems="10"
-                    android:hint="dd--mm--yyyy"
-                    android:inputType="date"
+                    android:text="..."
                     android:padding="16dp"
                     android:paddingStart="24dp"
                     android:paddingEnd="24dp"
                     android:textSize="14sp" />
+            </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginTop="24dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Estimated Arrival Date" />
+
+                <TextView
+                    android:id="@+id/tv_arrival_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/edit_text_disabled_rounded_corner"
+                    android:ems="10"
+                    android:text="..."
+                    android:padding="16dp"
+                    android:paddingStart="24dp"
+                    android:paddingEnd="24dp"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginTop="24dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_donation_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Donation Image" />
+
+                <ImageView
+                    android:id="@+id/iv_donation_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:background="@color/neutral"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginTop="24dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Item(s)" />
+
+                <TextView
+                    android:id="@+id/tv_items"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/edit_text_disabled_rounded_corner"
+                    android:ems="10"
+                    android:text="..."
+                    android:padding="16dp"
+                    android:paddingStart="24dp"
+                    android:paddingEnd="24dp"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginTop="24dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Delivery Method" />
+
+                <TextView
+                    android:id="@+id/tv_delivery_method"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/edit_text_disabled_rounded_corner"
+                    android:ems="10"
+                    android:text="..."
+                    android:padding="16dp"
+                    android:paddingStart="24dp"
+                    android:paddingEnd="24dp"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginTop="24dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Confirmation Messages" />
+
+                <EditText
+                    android:id="@+id/et_confirm_message"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/edit_text_rounded_corner"
+                    android:ems="10"
+                    android:hint="Message for your delivery"
+                    android:inputType="text"
+                    android:padding="16dp"
+                    android:paddingStart="24dp"
+                    android:paddingEnd="24dp"
+                    android:textSize="14sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -188,7 +285,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/poppins_medium"
                     android:paddingVertical="12dp"
-                    android:text="Send"
+                    android:text="Confirm"
                     android:textAllCaps="true"
                     android:textColor="@color/white"
                     app:layout_constraintBottom_toBottomOf="parent"
