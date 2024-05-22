@@ -147,6 +147,11 @@ class ManageDonationActivity<Button> : AppCompatActivity() {
                     deleteViewModel.delete(it)
 
                     dialog.dismiss()
+
+                    val intent = Intent(this, MainActivity::class.java).apply {
+                        putExtra("showHistoryFragment", true)
+                    }
+                    startActivity(intent)
                     finish()
                 }
             }
