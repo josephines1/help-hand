@@ -2,6 +2,7 @@ package com.example.helphandv10.activity
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.DatePickerDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -32,7 +33,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
+import java.util.Locale
 import java.util.UUID
 
 class DonationSendActivity : AppCompatActivity() {
@@ -76,8 +80,11 @@ class DonationSendActivity : AppCompatActivity() {
         val btnSubmit: ConstraintLayout = findViewById(R.id.cl_btn_submit)
         val btnSubmitText: TextView = findViewById(R.id.btn_send_text)
 
-        storageReference = FirebaseStorage.getInstance().reference
+        etDeliveryDate.setOnClickListener {
+            showDatePickerDialog(etDeliveryDate)
+        }
 
+        storageReference = FirebaseStorage.getInstance().reference
         cl_image.setOnClickListener {
             val intent = Intent(Intent.ACTION_PICK)
             intent.type = "image/*"
@@ -102,9 +109,22 @@ class DonationSendActivity : AppCompatActivity() {
             val deliveryMethod = if (rbDropOff.isChecked) "Drop Off" else "Courier"
             val items = etItems.text.toString().split(",").map { it.trim() }
 
-            if (message.isEmpty() || items.isEmpty() || deliveryDate == null) {
+            if (message.isEmpty() || items.any { it.isEmpty() }) {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
+            }
+
+            if (deliveryDate == null) {
+                Toast.makeText(this, "Invalid deadline format", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            } else if (Timestamp(deliveryDate) <= Timestamp.now()) {
+                Toast.makeText(this, "Delivery cannot be dated before today.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            } else if (donation != null) {
+                if (Timestamp(deliveryDate) > donation.deadline!!) {
+                    Toast.makeText(this, "No delivery after donation deadline: ${formatTimestamp(donation.deadline)}", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
             }
 
             if (::imageUri.isInitialized) {
@@ -186,6 +206,34 @@ class DonationSendActivity : AppCompatActivity() {
                 tv_upload_image?.visibility = View.GONE
             }
         }
+    }
+
+    private fun showDatePickerDialog(et_date: EditText) {
+        val calendar = Calendar.getInstance()
+        val year = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH)
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+        val datePickerDialog = DatePickerDialog(
+            this,
+            { _, selectedYear, selectedMonth, selectedDay ->
+                val selectedDate = "$selectedYear-${selectedMonth + 1}-$selectedDay"
+                et_date.setText(selectedDate)
+            },
+            year,
+            month,
+            day
+        )
+
+        datePickerDialog.show()
+    }
+
+    private fun formatTimestamp(timestamp: com.google.firebase.Timestamp): String {
+        val formatter = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale("id", "ID"))
+        // Mengonversi Timestamp ke LocalDateTime
+        val localDateTime = timestamp.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
+        // Menggunakan DateTimeFormatter untuk memformat LocalDateTime
+        return localDateTime.format(formatter)
     }
 
     companion object {

@@ -2,6 +2,7 @@ package com.example.helphandv10
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.DatePickerDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -11,7 +12,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -91,8 +91,11 @@ class CreateFragment : Fragment() {
         params.bottomMargin = newMarginBottom
         btn_create.layoutParams = params
 
-        storageReference = FirebaseStorage.getInstance().reference
+        et_date.setOnClickListener {
+            showDatePickerDialog(et_date)
+        }
 
+        storageReference = FirebaseStorage.getInstance().reference
         cl_image.setOnClickListener {
             val intent = Intent(Intent.ACTION_PICK)
             intent.type = "image/*"
@@ -105,7 +108,7 @@ class CreateFragment : Fragment() {
             val location = et_location.text.toString()
             val needs = et_needs.text.toString().split(",").map { it.trim() }
 
-            if (title.isEmpty() || date.isEmpty() || needs.isEmpty() || location.isEmpty()) {
+            if (title.isEmpty() || date.isEmpty() || needs.any { it.isEmpty() } || location.isEmpty()) {
                 Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -125,6 +128,9 @@ class CreateFragment : Fragment() {
 
             if (deadline == null) {
                 Toast.makeText(context, "Invalid deadline format", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            } else if (Timestamp(deadline) <= Timestamp.now()) {
+                Toast.makeText(context, "Deadline cannot be dated before today.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -177,6 +183,26 @@ class CreateFragment : Fragment() {
             startActivity(intent)
             requireActivity().finish()
         }
+    }
+
+    private fun showDatePickerDialog(et_date: EditText) {
+        val calendar = Calendar.getInstance()
+        val year = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH)
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+        context?.let {
+            DatePickerDialog(
+                it,
+                { _, selectedYear, selectedMonth, selectedDay ->
+                    val selectedDate = "$selectedYear-${selectedMonth + 1}-$selectedDay"
+                    et_date.setText(selectedDate)
+                },
+                year,
+                month,
+                day
+            )
+        }?.show()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

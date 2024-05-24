@@ -121,7 +121,7 @@ class DonationUpdateActivity : AppCompatActivity() {
             val location = et_location.text.toString()
             val items = et_items.text.toString().split(",").map { it.trim() }
 
-            if (title.isEmpty() || date.isEmpty() || items.isEmpty() || location.isEmpty()) {
+            if (title.isEmpty() || date.isEmpty() || items.any { it.isEmpty() } || location.isEmpty()) {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -141,6 +141,9 @@ class DonationUpdateActivity : AppCompatActivity() {
 
             if (deadline == null) {
                 Toast.makeText(this, "Invalid deadline format", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            } else if (Timestamp(deadline) <= Timestamp.now()) {
+                Toast.makeText(this, "Deadline cannot be dated before today.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
