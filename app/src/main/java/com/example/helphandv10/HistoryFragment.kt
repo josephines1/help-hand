@@ -51,6 +51,7 @@ class HistoryFragment : Fragment() {
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
+            showAsOrganizer = it.getBoolean("showAsOrganizer", false)
         }
     }
 
@@ -84,6 +85,7 @@ class HistoryFragment : Fragment() {
 
         // Initial data load
         loadData()
+        updateTextViewColors()
 
         // Set up the listener for the TextView tv_as_organizer
         tvAsOrganizer.setOnClickListener {
@@ -170,6 +172,7 @@ class HistoryFragment : Fragment() {
                 arguments = Bundle().apply {
                     putString(ARG_PARAM1, param1)
                     putString(ARG_PARAM2, param2)
+                    putBoolean("showAsOrganizer", false)
                 }
             }
     }

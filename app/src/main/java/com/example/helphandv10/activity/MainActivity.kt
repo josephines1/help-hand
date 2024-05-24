@@ -2,11 +2,15 @@ package com.example.helphandv10.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.NavigationUI
+import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.helphandv10.HistoryFragment
 import com.example.helphandv10.R
@@ -44,29 +48,52 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        if (intent.getBooleanExtra("showHistoryFragment", false)) {
-            navigateToHistoryFragment()
-        }
-
         val navBottom: BottomNavigationView = binding.navBottom
         val navController = findNavController(R.id.nav_host_fragment_activity_main)
 
         navBottom.setupWithNavController(navController)
+
+        var isShowHistory: Boolean = intent.getBooleanExtra("showHistoryFragment", false)
+        if (isShowHistory) {
+            navigateToHistoryFragment()
+        }
     }
 
     private fun navigateToHistoryFragment() {
-        val historyFragment = HistoryFragment.newInstance("param1", "param2")
         val bundle = Bundle().apply {
             putBoolean("showAsOrganizer", true)
         }
-        historyFragment.arguments = bundle
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, historyFragment)
-            .addToBackStack(null)
-            .commit()
 
-        // Mengubah item terpilih di BottomNavigationView
-        val bottomNav = findViewById<BottomNavigationView>(R.id.nav_bottom)
-        bottomNav.selectedItemId = R.id.nav_item_create
+        val navController = findNavController(R.id.nav_host_fragment_activity_main)
+        navController.navigate(R.id.nav_item_history, bundle)
+
+        // Tambahkan listener untuk BottomNavigationView
+        val navBottom: BottomNavigationView = binding.navBottom
+        navBottom.setOnNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.nav_item_home -> {
+                    // Navigasi kembali ke Fragment Home
+                    navController.navigate(R.id.nav_item_home)
+                    true
+                }
+                R.id.nav_item_search -> {
+                    navController.navigate(R.id.nav_item_search)
+                    true
+                }
+                R.id.nav_item_create -> {
+                    navController.navigate(R.id.nav_item_create)
+                    true
+                }
+                R.id.nav_item_history -> {
+                    navController.navigate(R.id.nav_item_history)
+                    true
+                }
+                R.id.nav_item_profile -> {
+                    navController.navigate(R.id.nav_item_profile)
+                    true
+                }
+                else -> false
+            }
+        }
     }
 }
