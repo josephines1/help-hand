@@ -2,17 +2,12 @@ package com.example.helphandv10.activity
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.NavigationUI
-import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.example.helphandv10.HistoryFragment
 import com.example.helphandv10.R
 import com.example.helphandv10.databinding.ActivityMainBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView

@@ -70,14 +70,6 @@ class DonationUpdateActivity : AppCompatActivity() {
         val cl_upload_image = findViewById<ConstraintLayout>(R.id.cl_upload_image)
         val iv_preview = findViewById<ImageView>(R.id.iv_preview)
 
-        val initialMarginBottom = resources.getDimensionPixelSize(R.dimen.m3_bottom_nav_min_height)
-        val additionalMargin = (24 * resources.displayMetrics.density + 0.5f).toInt()
-        val newMarginBottom = initialMarginBottom + additionalMargin
-
-        val params = btn_update.layoutParams as ViewGroup.MarginLayoutParams
-        params.bottomMargin = newMarginBottom
-        btn_update.layoutParams = params
-
         // Set up Firebase Cloud Storage
         storageReference = FirebaseStorage.getInstance().reference
 

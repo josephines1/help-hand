@@ -7,7 +7,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +15,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.Fragment
 import com.example.helphandv10.activity.MainActivity
 import com.example.helphandv10.activity.SuccessCreateDonation
 import com.example.helphandv10.databinding.FragmentHomeBinding
@@ -24,10 +24,11 @@ import com.example.helphandv10.viewmodel.donation.AddViewModel
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
-import org.koin.androidx.viewmodel.ext.android.viewModel
 import com.google.firebase.storage.StorageReference
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.Calendar
 import java.util.UUID
+
 
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
@@ -84,7 +85,7 @@ class CreateFragment : Fragment() {
         val btn_create_text = view.findViewById<TextView>(R.id.btn_create_text)
 
         val initialMarginBottom = resources.getDimensionPixelSize(R.dimen.m3_bottom_nav_min_height)
-        val additionalMargin = (48 * resources.displayMetrics.density + 0.5f).toInt()
+        val additionalMargin = (32 * resources.displayMetrics.density + 0.5f).toInt()
         val newMarginBottom = initialMarginBottom + additionalMargin
 
         val params = btn_create.layoutParams as ViewGroup.MarginLayoutParams
