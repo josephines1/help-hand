@@ -1,6 +1,7 @@
 package com.example.helphandv10.activity
 
 import android.annotation.SuppressLint
+import android.content.ContentValues.TAG
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -94,10 +95,37 @@ class DonationDetailActivity : AppCompatActivity() {
         val imageURL = donationDetail.donationImageUrl
         val location = donationDetail.location
         val deadline = donationDetail.deadline
+        val organizerIdPath = donationDetail.organizerId
 
         findViewById<TextView>(R.id.tv_detail_title).text = title
         findViewById<TextView>(R.id.tv_location).text = location
         findViewById<TextView>(R.id.tv_date).text = "Deadline: ${deadline?.let { formatTimestamp(it) }}"
+
+        val tv_organizer = findViewById<TextView>(R.id.tv_organizer)
+        val tv_phone = findViewById<TextView>(R.id.tv_phone)
+
+        // Kueri pengguna dengan ID organizer
+        val userRef = organizerIdPath.let {
+            FirebaseFirestore.getInstance().document(it) // Gunakan path yang valid
+        }
+        userRef.get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    // Dokumen pengguna ditemukan
+                    val organizerName = document.getString("username")
+                    val organizerPhone = document.getString("phoneNumber")
+                    tv_organizer.text = organizerName
+                    tv_phone.text = organizerPhone
+                } else {
+                    // Dokumen pengguna tidak ditemukan atau tidak ada
+                    tv_organizer.text = "..."
+                    tv_phone.text = "..."
+                }
+            }
+            .addOnFailureListener { exception ->
+                // Penanganan kesalahan saat mengambil dokumen pengguna
+                Log.e(TAG, "Error getting organizer document", exception)
+            }
 
         Glide.with(this)
             .load(imageURL)
@@ -105,7 +133,7 @@ class DonationDetailActivity : AppCompatActivity() {
             .into(findViewById(R.id.iv_detail_image))
 
         itemsRecyclerView = findViewById(R.id.rv_items_needed)
-        itemNeededAdapter = donationDetail.itemsNeeded?.let { ItemNeededAdapter(it) }!!
+        itemNeededAdapter = donationDetail.itemsNeeded.let { ItemNeededAdapter(it) }!!
         itemsRecyclerView.adapter = itemNeededAdapter
         itemsRecyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -122,7 +150,7 @@ class DonationDetailActivity : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
         val currentUser = auth.currentUser
         val currentUserId = currentUser?.uid
-        val organizerId = donationDetail.organizerId?.substringAfterLast("/")
+        val organizerId = donationDetail.organizerId.substringAfterLast("/")
 
         val tvTrackDonation = findViewById<TextView>(R.id.tv_track_donation)
         tvTrackDonation.visibility = View.GONE
