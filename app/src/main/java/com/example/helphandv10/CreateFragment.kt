@@ -3,6 +3,7 @@ package com.example.helphandv10
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.DatePickerDialog
+import android.content.ContentValues
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -28,6 +29,8 @@ import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.Calendar
 import java.util.UUID
@@ -83,15 +86,13 @@ class CreateFragment : Fragment() {
         val cl_image = view.findViewById<ConstraintLayout>(R.id.cl_create_image)
         val btn_create = view.findViewById<ConstraintLayout>(R.id.cl_btn_create)
         val btn_create_text = view.findViewById<TextView>(R.id.btn_create_text)
-
-        val initialMarginBottom = resources.getDimensionPixelSize(R.dimen.m3_bottom_nav_min_height)
-        val additionalMargin = (32 * resources.displayMetrics.density + 0.5f).toInt()
-        val newMarginBottom = initialMarginBottom + additionalMargin
         val linearLayout = view.findViewById<LinearLayout>(R.id.linearLayout)
         val linearLayout_in = view.findViewById<LinearLayout>(R.id.linearLayout_in)
 
+        val margin = (12 * resources.displayMetrics.density + 0.5f).toInt()
+
         val params = btn_create.layoutParams as ViewGroup.MarginLayoutParams
-        params.bottomMargin = newMarginBottom
+        params.bottomMargin = margin
         btn_create.layoutParams = params
 
         needsAdapter = NeedsAdapter(mutableListOf())

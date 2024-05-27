@@ -73,10 +73,8 @@ class HistoryFragment : Fragment() {
 
         setupAdapter()
 
-        val initialPaddingBottom = resources.getDimensionPixelSize(R.dimen.m3_bottom_nav_min_height)
-        val additionalPadding = (48 * resources.displayMetrics.density + 0.5f).toInt()
-        val newPaddingBottom = initialPaddingBottom + additionalPadding
-        recyclerView.setPadding(recyclerView.paddingLeft, recyclerView.paddingTop, recyclerView.paddingRight, newPaddingBottom)
+        val padding = (48 * resources.displayMetrics.density + 0.5f).toInt()
+        recyclerView.setPadding(recyclerView.paddingLeft, recyclerView.paddingTop, recyclerView.paddingRight, padding)
 
         val firestoreDb = FirebaseFirestore.getInstance()
         val donationRepository = DonationRepository(firestoreDb)

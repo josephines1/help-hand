@@ -28,9 +28,6 @@ class SearchFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
 
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var et_keyword: EditText
-    private lateinit var ic_back: ImageView
     private val searchViewModel: SearchViewModel by viewModel()
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
@@ -66,10 +63,8 @@ class SearchFragment : Fragment() {
             requireActivity().finish()
         }
 
-        val initialPaddingBottom = resources.getDimensionPixelSize(R.dimen.m3_bottom_nav_min_height)
-        val additionalPadding = (48 * resources.displayMetrics.density + 0.5f).toInt()
-        val newPaddingBottom = initialPaddingBottom + additionalPadding
-        binding.rvExplores.setPadding(binding.rvExplores.paddingLeft, binding.rvExplores.paddingTop, binding.rvExplores.paddingRight, newPaddingBottom)
+        val padding = (48 * resources.displayMetrics.density + 0.5f).toInt()
+        binding.rvExplores.setPadding(binding.rvExplores.paddingLeft, binding.rvExplores.paddingTop, binding.rvExplores.paddingRight, padding)
 
         binding.etKeyword.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
