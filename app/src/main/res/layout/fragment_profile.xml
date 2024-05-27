@@ -1,216 +1,238 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background">
+    android:background="@color/background"
+    android:orientation="vertical"
+    tools:context=".ProfileFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#F1FCF9"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="24dp">
 
-        <RelativeLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingHorizontal="24dp"
+            android:paddingTop="24dp">
 
             <ImageView
+                android:id="@+id/ic_back"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="14dp"
-                android:src="@drawable/group_17" />
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/group_17" />
 
             <TextView
+                android:id="@+id/tv_create_top_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
+                android:layout_gravity="center_horizontal"
+                android:fontFamily="@font/poppins_medium"
                 android:text="Profile"
                 android:textSize="18sp"
-                android:textStyle="bold" />
-        </RelativeLayout>
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/ic_back"
+                app:layout_constraintTop_toTopOf="parent" />
 
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <RelativeLayout
+        <LinearLayout
+            android:id="@+id/linear_header_user"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:paddingHorizontal="24dp"
+            android:paddingTop="24dp">
 
-            <ImageView
-                android:id="@+id/imageView2"
-                android:layout_width="90dp"
-                android:layout_height="90dp"
+            <androidx.cardview.widget.CardView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                app:cardCornerRadius="50dp">
+
+                <ImageView
+                    android:id="@+id/ivUserPhotoProfile"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:srcCompat="@drawable/icon_placeholder_photo_profile_secondary" />
+
+            </androidx.cardview.widget.CardView>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginStart="10dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                android:src="@drawable/icon_placeholder_photo_profile_secondary" />
+                android:orientation="vertical"
+                android:gravity="center_vertical">
 
-            <TextView
-                android:id="@+id/textViewUserName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentEnd="true"
-                android:layout_marginStart="28dp"
-                android:layout_marginTop="44dp"
-                android:layout_marginEnd="28dp"
-                android:layout_toEndOf="@+id/imageView2"
-                android:fontFamily="@font/poppins_bold"
-                android:text=""
-                android:textAlignment="viewStart"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/UserName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="Username"
+                    android:textStyle="bold" />
 
-        </RelativeLayout>
+            </LinearLayout>
+        </LinearLayout>
 
-
-        <RelativeLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/btnSetting"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
             android:layout_marginEnd="20dp"
-            android:orientation="vertical">
+            android:layout_marginTop="50dp"
+            android:background="@drawable/button_tertiary_rounded_corner"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
 
             <ImageView
-                android:id="@+id/imageView"
-                android:layout_width="match_parent"
-                android:layout_height="42dp"
-                android:src="@drawable/button_white_rounded_corner" />
-
-            <ImageView
-                android:layout_width="15sp"
-                android:layout_height="15sp"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="14dp"
-                android:layout_marginBottom="10dp"
-                android:src="@drawable/icon_settings" />
+                android:id="@+id/icon_setting"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_settings"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.5"/>
 
             <TextView
+                android:id="@+id/setting"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignEnd="@+id/imageView"
-                android:layout_alignBottom="@+id/imageView"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:layout_marginStart="30dp"
-                android:layout_marginTop="11dp"
-                android:layout_marginEnd="212dp"
-                android:layout_marginBottom="12dp"
+                android:layout_marginStart="3dp"
+                android:fontFamily="@font/poppins_regular"
                 android:text="Settings"
-                android:textAlignment="viewStart" />
-        </RelativeLayout>
+                android:textColor="@color/black"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.175"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.541" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <RelativeLayout
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/btnHelp"
             android:layout_width="match_parent"
-            android:layout_height="43dp"
+            android:layout_height="48dp"
             android:layout_marginStart="20dp"
             android:layout_marginTop="20dp"
             android:layout_marginEnd="20dp"
-            android:orientation="vertical">
+            android:background="@drawable/button_tertiary_rounded_corner"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
 
             <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="42dp"
-                android:src="@drawable/button_white_rounded_corner" />
-
-            <ImageView
-                android:layout_width="15sp"
-                android:layout_height="15sp"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="14dp"
-                android:src="@drawable/icon_help" />
+                android:id="@+id/icon_setting2"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_question"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.5" />
 
             <TextView
+                android:id="@+id/setting2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentBottom="true"
-                android:layout_marginStart="32dp"
-                android:layout_marginTop="12dp"
-                android:layout_marginEnd="246dp"
-                android:layout_marginBottom="12dp"
+                android:layout_marginStart="3dp"
+                android:fontFamily="@font/poppins_regular"
                 android:text="Help"
-                android:textAlignment="viewStart" />
-        </RelativeLayout>
+                android:textColor="@color/black"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.175"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.541" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <RelativeLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/btnAbout"
             android:layout_width="match_parent"
-            android:layout_height="43dp"
+            android:layout_height="48dp"
             android:layout_marginStart="20dp"
             android:layout_marginTop="20dp"
             android:layout_marginEnd="20dp"
-            android:orientation="vertical">
+            android:background="@drawable/button_tertiary_rounded_corner"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
 
             <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="42dp"
-                android:src="@drawable/button_white_rounded_corner" />
-
-            <ImageView
-                android:layout_width="15sp"
-                android:layout_height="15sp"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:layout_marginStart="9dp"
-                android:layout_marginTop="13dp"
-                android:src="@drawable/icon_info" />
+                android:id="@+id/icon_setting3"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_info"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.5" />
 
             <TextView
+                android:id="@+id/setting3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentBottom="true"
-                android:layout_marginStart="33dp"
-                android:layout_marginTop="9dp"
-                android:layout_marginEnd="108dp"
-                android:layout_marginBottom="12dp"
-                android:text="About Helphand" />
+                android:layout_marginStart="3dp"
+                android:fontFamily="@font/poppins_regular"
+                android:text="About HelpHand"
+                android:textColor="@color/black"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.24"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </RelativeLayout>
-
-        <RelativeLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/btnLogout"
             android:layout_width="match_parent"
-            android:layout_height="43dp"
+            android:layout_height="48dp"
             android:layout_marginStart="20dp"
             android:layout_marginTop="20dp"
             android:layout_marginEnd="20dp"
-            android:orientation="vertical">
+            android:background="@drawable/button_tertiary_rounded_corner"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
 
             <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="42dp"
-                android:src="@drawable/button_white_rounded_corner" />
-
-            <ImageView
-                android:layout_width="15sp"
-                android:layout_height="15sp"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:layout_marginStart="9dp"
-                android:layout_marginTop="13dp"
-                android:src="@drawable/icon_logout" />
+                android:id="@+id/icon_setting4"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_logout"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.5" />
 
             <TextView
+                android:id="@+id/setting4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentBottom="true"
-                android:layout_marginStart="33dp"
-                android:layout_marginTop="9dp"
-                android:layout_marginEnd="223dp"
-                android:layout_marginBottom="8dp"
-                android:text="Log Out" />
-        </RelativeLayout>
+                android:layout_marginStart="3dp"
+                android:fontFamily="@font/poppins_regular"
+                android:text="Log Out"
+                android:textColor="@color/black"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.183"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.541" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </LinearLayout>
-</ScrollView>
+
+</FrameLayout>
