@@ -70,14 +70,6 @@ class DonationUpdateActivity : AppCompatActivity() {
         val cl_upload_image = findViewById<ConstraintLayout>(R.id.cl_upload_image)
         val iv_preview = findViewById<ImageView>(R.id.iv_preview)
 
-        val initialMarginBottom = resources.getDimensionPixelSize(R.dimen.m3_bottom_nav_min_height)
-        val additionalMargin = (24 * resources.displayMetrics.density + 0.5f).toInt()
-        val newMarginBottom = initialMarginBottom + additionalMargin
-
-        val params = btn_update.layoutParams as ViewGroup.MarginLayoutParams
-        params.bottomMargin = newMarginBottom
-        btn_update.layoutParams = params
-
         // Set up Firebase Cloud Storage
         storageReference = FirebaseStorage.getInstance().reference
 
@@ -121,7 +113,7 @@ class DonationUpdateActivity : AppCompatActivity() {
             val location = et_location.text.toString()
             val items = et_items.text.toString().split(",").map { it.trim() }
 
-            if (title.isEmpty() || date.isEmpty() || items.isEmpty() || location.isEmpty()) {
+            if (title.isEmpty() || date.isEmpty() || items.any { it.isEmpty() } || location.isEmpty()) {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -141,6 +133,9 @@ class DonationUpdateActivity : AppCompatActivity() {
 
             if (deadline == null) {
                 Toast.makeText(this, "Invalid deadline format", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            } else if (Timestamp(deadline) <= Timestamp.now()) {
+                Toast.makeText(this, "Deadline cannot be dated before today.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 

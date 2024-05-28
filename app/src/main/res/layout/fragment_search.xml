@@ -97,8 +97,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text4"
-            android:layout_marginHorizontal="24dp"
-            android:paddingBottom="@dimen/m3_bottom_nav_min_height" />
+            android:layout_marginHorizontal="24dp" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

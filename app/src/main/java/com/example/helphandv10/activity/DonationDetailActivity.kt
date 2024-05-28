@@ -8,11 +8,13 @@ import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,13 +24,14 @@ import com.example.helphandv10.R
 import com.example.helphandv10.adapter.ItemNeededAdapter
 import com.example.helphandv10.data.DonationRepository
 import com.example.helphandv10.model.Donations
+import com.example.helphandv10.utils.Resource
+import com.example.helphandv10.viewmodel.donation.DetailViewModel
 import com.example.helphandv10.viewmodel.donation.HistoryViewModel
 import com.example.helphandv10.viewmodel.donation.HistoryViewModelFactory
-import com.google.firebase.Firebase
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.firestore
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -37,8 +40,9 @@ import java.util.Locale
 class DonationDetailActivity : AppCompatActivity() {
     private lateinit var itemsRecyclerView: RecyclerView
     private lateinit var itemNeededAdapter: ItemNeededAdapter
-    private lateinit var donationViewModel: HistoryViewModel
     private lateinit var auth: FirebaseAuth
+
+    private val viewModel: DetailViewModel by viewModels()
 
     @SuppressLint("ResourceAsColor")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,33 +56,60 @@ class DonationDetailActivity : AppCompatActivity() {
         }
 
         val donationDetail: Donations? = intent.getParcelableExtra("DONATION")
+        val donationId = donationDetail?.id
 
-        val title = donationDetail?.title
-        val imageURL = donationDetail?.donationImageUrl
-        val itemNeeded = donationDetail?.itemsNeeded
-        val organizerIdPath = donationDetail?.organizerId
-        val location = donationDetail?.location
+        donationId?.let { id ->
+            lifecycleScope.launch {
+                viewModel.getDonationById(id)
+                observeDonationDetail()
+            }
+        }
+    }
 
-        val tv_title = findViewById<TextView>(R.id.tv_detail_title)
-        val iv_image = findViewById<ImageView>(R.id.iv_detail_image)
+    private fun observeDonationDetail() {
+        viewModel.donationDetailState.observe(this, Observer { resource ->
+            Log.d("DONATION DETAIL RESOURCE", resource.toString())
+            when (resource) {
+                is Resource.Success -> {
+                    val donationDetail = resource.data
+                    Log.d("DONATION DETAIL", donationDetail.toString())
+                    donationDetail?.let {
+                        setupUI(it)
+                        setupDonationButton(it)
+                    }
+                }
+                is Resource.Error -> {
+                    handleErrorMessage(resource.error)
+                    Log.d("DONATION DETAIL", resource.error)
+                }
+                is Resource.Loading -> {
+                    // Tampilkan loading UI jika diperlukan
+                }
+            }
+        })
+    }
+
+    private fun setupUI(donationDetail: Donations) {
+        // Lakukan penyesuaian UI dengan detail donasi yang diterima
+        val title = donationDetail.title
+        val imageURL = donationDetail.donationImageUrl
+        val location = donationDetail.location
+        val deadline = donationDetail.deadline
+        val organizerIdPath = donationDetail.organizerId
+
+        findViewById<TextView>(R.id.tv_detail_title).text = title
+        findViewById<TextView>(R.id.tv_location).text = location
+        findViewById<TextView>(R.id.tv_date).text = "Deadline: ${deadline?.let { formatTimestamp(it) }}"
+
         val tv_organizer = findViewById<TextView>(R.id.tv_organizer)
-        val tv_location = findViewById<TextView>(R.id.tv_location)
         val tv_phone = findViewById<TextView>(R.id.tv_phone)
-        val tv_date = findViewById<TextView>(R.id.tv_date)
 
-        tv_title.text = title
-        tv_location.text = location
-        tv_date.text = "Deadline: ${donationDetail?.deadline?.let { formatTimestamp(it) }}"
-
-        // Log the organizerIdPath for debugging
-        Log.d(TAG, "Organizer ID Path: $organizerIdPath")
-
-        // Kueri pengguna dengan ID pengatur acara
-        val userRef = organizerIdPath?.let {
+        // Kueri pengguna dengan ID organizer
+        val userRef = organizerIdPath.let {
             FirebaseFirestore.getInstance().document(it) // Gunakan path yang valid
         }
-        userRef?.get()
-            ?.addOnSuccessListener { document ->
+        userRef.get()
+            .addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
                     // Dokumen pengguna ditemukan
                     val organizerName = document.getString("username")
@@ -87,11 +118,11 @@ class DonationDetailActivity : AppCompatActivity() {
                     tv_phone.text = organizerPhone
                 } else {
                     // Dokumen pengguna tidak ditemukan atau tidak ada
-                    tv_organizer.text = "Orang Baik"
-                    tv_phone.text = "-"
+                    tv_organizer.text = "..."
+                    tv_phone.text = "..."
                 }
             }
-            ?.addOnFailureListener { exception ->
+            .addOnFailureListener { exception ->
                 // Penanganan kesalahan saat mengambil dokumen pengguna
                 Log.e(TAG, "Error getting organizer document", exception)
             }
@@ -99,57 +130,66 @@ class DonationDetailActivity : AppCompatActivity() {
         Glide.with(this)
             .load(imageURL)
             .centerCrop()
-            .into(iv_image)
+            .into(findViewById(R.id.iv_detail_image))
 
         itemsRecyclerView = findViewById(R.id.rv_items_needed)
-        itemNeededAdapter = itemNeeded?.let { ItemNeededAdapter(it) }!!
+        itemNeededAdapter = donationDetail.itemsNeeded.let { ItemNeededAdapter(it) }!!
         itemsRecyclerView.adapter = itemNeededAdapter
         itemsRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        val iconBack = findViewById<ImageView>(R.id.ic_back)
-
-        iconBack.setOnClickListener{
+        findViewById<ImageView>(R.id.ic_back).setOnClickListener {
             finish()
         }
+    }
 
-        val btn_donate = findViewById<TextView>(R.id.btn_donate)
+    @SuppressLint("ResourceAsColor")
+    private fun setupDonationButton(donationDetail: Donations) {
+        val btnDonate = findViewById<TextView>(R.id.btn_donate)
+        val deadline = donationDetail.deadline
 
-        auth = Firebase.auth
+        auth = FirebaseAuth.getInstance()
         val currentUser = auth.currentUser
         val currentUserId = currentUser?.uid
-        val organizerId = organizerIdPath?.substringAfterLast("/")
+        val organizerId = donationDetail.organizerId.substringAfterLast("/")
 
-        val tv_track_donation = findViewById<TextView>(R.id.tv_track_donation)
-        tv_track_donation.visibility = View.GONE
+        val tvTrackDonation = findViewById<TextView>(R.id.tv_track_donation)
+        tvTrackDonation.visibility = View.GONE
 
         val firestoreDb = FirebaseFirestore.getInstance()
         val donationRepository = DonationRepository(firestoreDb)
         val factory = HistoryViewModelFactory(donationRepository)
-        donationViewModel = ViewModelProvider(this, factory).get(HistoryViewModel::class.java)
+        val donationViewModel = ViewModelProvider(this, factory).get(HistoryViewModel::class.java)
+
         lifecycleScope.launch {
             donationViewModel.getDonationsByDonor().collect { donations ->
-                // Memeriksa apakah ID donasi terkait ada dalam hasil query
                 val isDonationAlreadyMade = donations.any { it.id == donationDetail.id }
 
                 if (isDonationAlreadyMade) {
                     // Menonaktifkan tombol donasi
-                    btn_donate.text = "You Already Donate"
-                    btn_donate.setTextColor(R.color.text)
-                    btn_donate.setBackgroundResource(R.drawable.button_neutral_rounded_corner)
+                    btnDonate.text = "You Already Donated"
+                    btnDonate.setTextColor(R.color.text)
+                    btnDonate.setBackgroundResource(R.drawable.button_neutral_rounded_corner)
 
                     // Menampilkan text view untuk melacak donasi
-                    tv_track_donation.visibility = View.VISIBLE
-                } else if(currentUserId != organizerId) {
-                    btn_donate.setOnClickListener{
+                    tvTrackDonation.visibility = View.VISIBLE
+
+                } else if (deadline != null && deadline < Timestamp.now()) {
+                    // Jika deadline sudah lewat, atur teks tombol menjadi "Closed" dan nonaktifkan tombol
+                    btnDonate.text = "Closed"
+                    btnDonate.setTextColor(R.color.text)
+                    btnDonate.setBackgroundResource(R.drawable.button_neutral_rounded_corner)
+
+                } else if (currentUserId != organizerId) {
+                    btnDonate.setOnClickListener {
                         startActivity(Intent(this@DonationDetailActivity, DonationSendActivity::class.java).apply {
                             putExtra("DONATION", donationDetail)
                         })
                         finish()
                     }
                 } else {
-                    btn_donate.text = "Manage Donation"
+                    btnDonate.text = "Manage Donation"
 
-                    btn_donate.setOnClickListener{
+                    btnDonate.setOnClickListener {
                         startActivity(Intent(this@DonationDetailActivity, ManageDonationActivity::class.java).apply {
                             putExtra("DONATION", donationDetail)
                         })
@@ -158,6 +198,11 @@ class DonationDetailActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun handleErrorMessage(message: String?) {
+        // Penanganan kesalahan saat mengambil detail donasi
+        Toast.makeText(this@DonationDetailActivity, "Error: $message", Toast.LENGTH_SHORT).show()
     }
 
     private fun formatTimestamp(timestamp: com.google.firebase.Timestamp): String {

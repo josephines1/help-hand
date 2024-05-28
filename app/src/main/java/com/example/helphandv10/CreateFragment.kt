@@ -2,30 +2,36 @@ package com.example.helphandv10
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.DatePickerDialog
+import android.content.ContentValues
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.RecyclerView
 import com.example.helphandv10.activity.MainActivity
 import com.example.helphandv10.activity.SuccessCreateDonation
-import com.example.helphandv10.databinding.FragmentHomeBinding
+import com.example.helphandv10.adapter.NeedsAdapter
 import com.example.helphandv10.model.Donations
 import com.example.helphandv10.viewmodel.donation.AddViewModel
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
-import org.koin.androidx.viewmodel.ext.android.viewModel
 import com.google.firebase.storage.StorageReference
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.Calendar
 import java.util.UUID
 
@@ -36,12 +42,11 @@ class CreateFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
 
-    private var _binding: FragmentHomeBinding? = null
-    private val binding get() = _binding!!
-
     private val addViewModel: AddViewModel by viewModel()
     private lateinit var storageReference: StorageReference
     private lateinit var imageUri: Uri
+
+    private lateinit var needsAdapter: NeedsAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,41 +76,93 @@ class CreateFragment : Fragment() {
         const val IMAGE_PICK_CODE = 1000
     }
 
-    @SuppressLint("ResourceAsColor")
+    @SuppressLint("ResourceAsColor", "ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val et_title = view.findViewById<EditText>(R.id.et_create_title)
         val et_date = view.findViewById<EditText>(R.id.et_create_date)
         val et_location = view.findViewById<EditText>(R.id.et_create_location)
-        val et_needs = view.findViewById<EditText>(R.id.et_create_needs)
         val cl_image = view.findViewById<ConstraintLayout>(R.id.cl_create_image)
         val btn_create = view.findViewById<ConstraintLayout>(R.id.cl_btn_create)
         val btn_create_text = view.findViewById<TextView>(R.id.btn_create_text)
+        val linearLayout = view.findViewById<LinearLayout>(R.id.linearLayout)
+        val linearLayout_in = view.findViewById<LinearLayout>(R.id.linearLayout_in)
 
-        val initialMarginBottom = resources.getDimensionPixelSize(R.dimen.m3_bottom_nav_min_height)
-        val additionalMargin = (48 * resources.displayMetrics.density + 0.5f).toInt()
-        val newMarginBottom = initialMarginBottom + additionalMargin
+        val margin = (12 * resources.displayMetrics.density + 0.5f).toInt()
 
         val params = btn_create.layoutParams as ViewGroup.MarginLayoutParams
-        params.bottomMargin = newMarginBottom
+        params.bottomMargin = margin
         btn_create.layoutParams = params
 
-        storageReference = FirebaseStorage.getInstance().reference
+        needsAdapter = NeedsAdapter(mutableListOf())
 
+        fun addNewInputField() {
+            val newItemView = LayoutInflater.from(requireContext()).inflate(R.layout.item_need, linearLayout, false)
+            val needEditText = linearLayout_in.findViewById<EditText>(R.id.et_needs)
+
+            newItemView.findViewById<ImageView>(R.id.btnDelNeed).setOnClickListener {
+                linearLayout.removeView(newItemView)
+            }
+
+            // Validasi jika edit text kosong
+            if(needEditText.text.toString().isEmpty()) {
+                Toast.makeText(
+                    requireContext(),
+                    "Please fill in the item needs",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return
+            }
+
+            linearLayout.addView(newItemView)
+        }
+
+        // Menambahkan onClickListener untuk tombol tambah Need
+        val btnAddNeed = view.findViewById<ImageView>(R.id.btnAddNeed)
+        btnAddNeed.setOnClickListener {
+            addNewInputField()
+        }
+
+        et_date.setOnClickListener {
+            showDatePickerDialog(et_date)
+        }
+
+        storageReference = FirebaseStorage.getInstance().reference
         cl_image.setOnClickListener {
             val intent = Intent(Intent.ACTION_PICK)
             intent.type = "image/*"
             startActivityForResult(intent, IMAGE_PICK_CODE)
         }
 
+        fun collectDataFromLinearLayout(container: LinearLayout): List<String> {
+            val inputData = mutableListOf<String>()
+            // Iterasi melalui setiap child dari LinearLayout container
+            for (i in 0 until container.childCount) {
+                val view = container.getChildAt(i)
+                // Jika child merupakan LinearLayout, kita perlu memanggil fungsi ini secara rekursif
+                if (view is LinearLayout) {
+                    // Panggil fungsi rekursif untuk mengumpulkan data dari LinearLayout anak
+                    val dataFromChildLayout = collectDataFromLinearLayout(view)
+                    // Tambahkan semua data dari LinearLayout anak ke dalam inputData
+                    inputData.addAll(dataFromChildLayout)
+                }
+                // Jika child merupakan EditText, tambahkan teksnya ke dalam inputData
+                if (view is EditText) {
+                    inputData.add(view.text.toString())
+                }
+            }
+            return inputData
+        }
+
         btn_create.setOnClickListener {
             val title = et_title.text.toString()
             val date = et_date.text.toString()
             val location = et_location.text.toString()
-            val needs = et_needs.text.toString().split(",").map { it.trim() }
+            val needs = collectDataFromLinearLayout(linearLayout)
+            Log.d("NEEDS INPUT", needs.toString())
 
-            if (title.isEmpty() || date.isEmpty() || needs.isEmpty() || location.isEmpty()) {
+            if (title.isEmpty() || date.isEmpty() || needs.any { it.isEmpty() } || location.isEmpty()) {
                 Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -125,6 +182,9 @@ class CreateFragment : Fragment() {
 
             if (deadline == null) {
                 Toast.makeText(context, "Invalid deadline format", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            } else if (Timestamp(deadline) < Timestamp.now()) {
+                Toast.makeText(context, "Deadline cannot be dated before today.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -177,6 +237,26 @@ class CreateFragment : Fragment() {
             startActivity(intent)
             requireActivity().finish()
         }
+    }
+
+    private fun showDatePickerDialog(et_date: EditText) {
+        val calendar = Calendar.getInstance()
+        val year = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH)
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+        context?.let {
+            DatePickerDialog(
+                it,
+                { _, selectedYear, selectedMonth, selectedDay ->
+                    val selectedDate = "$selectedYear-${selectedMonth + 1}-$selectedDay"
+                    et_date.setText(selectedDate)
+                },
+                year,
+                month,
+                day
+            )
+        }?.show()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
