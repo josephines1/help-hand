@@ -112,6 +112,7 @@ class ManageDonationActivity<Button> : AppCompatActivity() {
             val intent = Intent(this, DonationUpdateActivity::class.java)
             intent.putExtra("data", donationDetail)
             startActivity(intent)
+            finish()
         }
 
         // Set up Firebase Cloud Storage

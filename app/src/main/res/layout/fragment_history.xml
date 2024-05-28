@@ -79,6 +79,16 @@
             </LinearLayout>
 
             <TextView
+                android:id="@+id/tvLoading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="24dp"
+                android:text="Wait a second.."
+                android:textAlignment="center"
+                android:visibility="gone" />
+
+            <TextView
                 android:id="@+id/tvNoData"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

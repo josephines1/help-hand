@@ -105,22 +105,40 @@ class CreateFragment : Fragment() {
                 linearLayout.removeView(newItemView)
             }
 
-            // Validasi jika edit text kosong
-            if(needEditText.text.toString().isEmpty()) {
-                Toast.makeText(
-                    requireContext(),
-                    "Please fill in the item needs",
-                    Toast.LENGTH_SHORT
-                ).show()
-                return
-            }
-
             linearLayout.addView(newItemView)
         }
 
         // Menambahkan onClickListener untuk tombol tambah Need
         val btnAddNeed = view.findViewById<ImageView>(R.id.btnAddNeed)
         btnAddNeed.setOnClickListener {
+            // Check if any EditText is empty before adding a new field
+            var allFieldsFilled = true
+            for (i in 0 until linearLayout.childCount) {
+                val view = linearLayout.getChildAt(i)
+                if (view is LinearLayout) {
+                    for (j in 0 until view.childCount) {
+                        val innerView = view.getChildAt(j)
+                        if (innerView is EditText && innerView.text.toString().isEmpty()) {
+                            allFieldsFilled = false
+                            break
+                        }
+                    }
+                }
+                if (view is EditText && view.text.toString().isEmpty()) {
+                    allFieldsFilled = false
+                    break
+                }
+            }
+
+            if (!allFieldsFilled) {
+                Toast.makeText(
+                    context,
+                    "Please fill in all item needs before adding a new one",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@setOnClickListener
+            }
+
             addNewInputField()
         }
 

@@ -45,6 +45,7 @@ class HistoryFragment : Fragment() {
     private lateinit var tvAsDonor: TextView
     private lateinit var tvAsOrganizer: TextView
     private lateinit var tvNoData: TextView
+    private lateinit var tvLoading: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,6 +71,7 @@ class HistoryFragment : Fragment() {
         tvAsDonor = view.findViewById(R.id.tv_as_donor)
         tvAsOrganizer = view.findViewById(R.id.tv_as_organizer)
         tvNoData = view.findViewById(R.id.tvNoData)
+        tvLoading = view.findViewById(R.id.tvLoading)
 
         setupAdapter()
 
@@ -117,13 +119,17 @@ class HistoryFragment : Fragment() {
     }
 
     private fun loadData() {
+        tvLoading.visibility = View.VISIBLE
+
         lifecycleScope.launch {
             if (showAsOrganizer) {
                 donationViewModel.getDonationsByOrganizer().collect { donations ->
+                    tvLoading.visibility = View.GONE
                     updateUI(donations)
                 }
             } else {
                 donationViewModel.getDonationsByDonor().collect { donations ->
+                    tvLoading.visibility = View.GONE
                     updateUI(donations)
                 }
             }

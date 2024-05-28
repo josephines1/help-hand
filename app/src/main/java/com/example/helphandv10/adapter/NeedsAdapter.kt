@@ -3,6 +3,7 @@ package com.example.helphandv10.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -28,12 +29,13 @@ class NeedsAdapter(private val needs: MutableList<String>) :
     override fun getItemCount(): Int = needs.size
 
     inner class NeedViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val needTextView: TextView = itemView.findViewById(R.id.et_needs)
+        private val needEditText: EditText = itemView.findViewById(R.id.et_needs)
 
         fun bind(need: String) {
-            needTextView.text = need
+            needEditText.setText(need)
         }
     }
+
     fun removeNeed(position: Int) {
         needs.removeAt(position)
         notifyDataSetChanged()

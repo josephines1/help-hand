@@ -196,7 +196,7 @@
                         android:id="@+id/tv_upload_image"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Upload Image Here"
+                        android:text="Click to Change Image"
                         android:textSize="12sp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -217,18 +217,46 @@
                     android:layout_height="wrap_content"
                     android:text="Need(s)" />
 
-                <EditText
-                    android:id="@+id/et_update_items"
+                <LinearLayout
+                    android:id="@+id/linearLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/edit_text_rounded_corner"
-                    android:ems="10"
-                    android:hint="Items Needed (Separate with comma)"
-                    android:inputType="text"
-                    android:padding="16dp"
-                    android:paddingStart="24dp"
-                    android:paddingEnd="24dp"
-                    android:textSize="14sp" />
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:id="@+id/linearLayout_in"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="8dp">
+
+                        <EditText
+                            android:id="@+id/et_needs"
+                            android:layout_width="wrap_content"
+                            android:layout_weight="1.5"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/edit_text_rounded_corner"
+                            android:ems="10"
+                            android:hint="Items Needed"
+                            android:inputType="text"
+                            android:padding="16dp"
+                            android:paddingStart="24dp"
+                            android:paddingEnd="24dp"
+                            android:textSize="14sp"/>
+
+                        <ImageButton
+                            android:id="@+id/btnAddNeed"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.5"
+                            android:src="@drawable/icon_plus"
+                            android:layout_marginStart="12dp"
+                            android:layout_gravity="center"
+                            android:background="?android:attr/selectableItemBackgroundBorderless"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
 
             </LinearLayout>
 
