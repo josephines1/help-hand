@@ -150,17 +150,87 @@
                     android:text="Address" />
 
                 <EditText
-                    android:id="@+id/et_create_location"
+                    android:id="@+id/et_create_address"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/edit_text_rounded_corner"
                     android:ems="10"
-                    android:hint="Donation Location"
+                    android:hint="Address"
                     android:inputType="text"
                     android:padding="16dp"
                     android:paddingStart="24dp"
                     android:paddingEnd="24dp"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    android:layout_marginBottom="24dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="4dp"
+                        android:orientation="vertical"
+                        android:layout_weight="0.5">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Latitude" />
+
+                        <EditText
+                            android:id="@+id/et_latitude"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/edit_text_rounded_corner"
+                            android:ems="10"
+                            android:hint="Latitude"
+                            android:inputType="numberSigned|numberDecimal"
+                            android:padding="16dp"
+                            android:paddingStart="24dp"
+                            android:paddingEnd="24dp"
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:orientation="vertical"
+                        android:layout_weight="0.5">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Longitude" />
+
+                        <EditText
+                            android:id="@+id/et_longitude"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/edit_text_rounded_corner"
+                            android:ems="10"
+                            android:hint="Longitude"
+                            android:inputType="numberSigned|numberDecimal"
+                            android:padding="16dp"
+                            android:paddingStart="24dp"
+                            android:paddingEnd="24dp"
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <WebView
+                    android:id="@+id/webview_map"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:layout_marginTop="16dp"
+                    tools:ignore="WebViewLayout" />
 
             </LinearLayout>
 

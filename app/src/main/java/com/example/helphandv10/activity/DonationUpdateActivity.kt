@@ -5,9 +5,17 @@ import android.app.DatePickerDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.ViewGroup
+import android.webkit.JavascriptInterface
+import android.webkit.WebChromeClient
+import android.webkit.WebSettings
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -38,13 +46,15 @@ import java.util.UUID
 
 class DonationUpdateActivity : AppCompatActivity() {
 
+    private var latitude: Double = 0.0
+    private var longitude: Double = 0.0
     private val updateViewModel: UpdateViewModel by viewModel()
     private lateinit var storageReference: StorageReference
     private lateinit var imageUri: Uri
     private lateinit var needsAdapter: NeedsAdapter
-    private var needsCounter = 0
+    private lateinit var webViewMap: WebView
 
-    @SuppressLint("ResourceAsColor")
+    @SuppressLint("ResourceAsColor", "ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -53,6 +63,38 @@ class DonationUpdateActivity : AppCompatActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
+        }
+
+        // Initialize WebView
+        webViewMap = findViewById(R.id.webview_map)
+        configureWebView()
+
+        // Load Leaflet map HTML file from assets
+        webViewMap.loadUrl("file:///android_asset/leaflet_map.html")
+
+        // Menambahkan listener untuk mengatur scroll
+        webViewMap.setOnTouchListener { _, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    // Menonaktifkan scroll ketika user menyentuh WebView
+                    webViewMap.requestDisallowInterceptTouchEvent(true)
+                }
+                MotionEvent.ACTION_UP -> {
+                    // Mengaktifkan kembali scroll setelah user melepaskan sentuhan
+                    webViewMap.requestDisallowInterceptTouchEvent(false)
+                    // Panggil performClick untuk menangani performClick yang diharapkan oleh WebView
+                    webViewMap.performClick()
+                }
+            }
+            false
+        }
+
+        webViewMap.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView?, url: String?) {
+                super.onPageFinished(view, url)
+                // Set latitude dan longitude ke nilai dari input field
+                webViewMap.loadUrl("javascript:showLocationOnMap();")
+            }
         }
 
         val iconBack = findViewById<ImageView>(R.id.ic_back)
@@ -74,7 +116,6 @@ class DonationUpdateActivity : AppCompatActivity() {
         val cl_upload_image = findViewById<ConstraintLayout>(R.id.cl_upload_image)
         val iv_preview = findViewById<ImageView>(R.id.iv_preview)
         val linearLayout = findViewById<LinearLayout>(R.id.linearLayout)
-        val linearLayout_in = findViewById<LinearLayout>(R.id.linearLayout_in)
 
         val margin = (12 * resources.displayMetrics.density + 0.5f).toInt()
         val params = btn_update.layoutParams as ViewGroup.MarginLayoutParams
@@ -155,6 +196,56 @@ class DonationUpdateActivity : AppCompatActivity() {
             startActivityForResult(intent, IMAGE_PICK_CODE)
         }
 
+        // Mendapatkan referensi EditText untuk latitude dan longitude
+        val etLatitude = findViewById<EditText>(R.id.et_latitude)
+        val etLongitude = findViewById<EditText>(R.id.et_longitude)
+
+        val coordinate = donation?.coordinate
+
+        if(coordinate != null) {
+            val parts = coordinate.split(",")
+            latitude = parts[0].trim().toDouble()
+            longitude = parts[1].trim().toDouble()
+        }
+
+        // Set data awal coordinate ke dalam EditText
+        etLatitude.setText(latitude.toString())
+        etLongitude.setText(longitude.toString())
+
+        // Menambahkan pendengar acara (event listener) ke EditText untuk latitude
+        etLatitude.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // Tidak perlu melakukan apa pun sebelum teks berubah
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // Tidak perlu melakukan apa pun saat teks berubah
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                // Panggil setSelectedLocation() dengan nilai latitude yang baru
+                val latitude = s?.toString()?.toDoubleOrNull() ?: return // Mengonversi teks ke Double
+                setSelectedLocation(latitude, longitude)
+            }
+        })
+
+        // Menambahkan pendengar acara (event listener) ke EditText untuk longitude
+        etLongitude.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // Tidak perlu melakukan apa pun sebelum teks berubah
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // Tidak perlu melakukan apa pun saat teks berubah
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                // Panggil setSelectedLocation() dengan nilai longitude yang baru
+                val longitude = s?.toString()?.toDoubleOrNull() ?: return // Mengonversi teks ke Double
+                setSelectedLocation(latitude, longitude)
+            }
+        })
+
         et_date.setOnClickListener {
             showDatePickerDialog(et_date)
         }
@@ -201,6 +292,9 @@ class DonationUpdateActivity : AppCompatActivity() {
             val title = et_title.text.toString()
             val date = et_date.text.toString()
             val location = et_location.text.toString()
+            val latitude = etLatitude.text.toString()
+            val longitude = etLongitude.text.toString()
+            val coordinate = "$latitude, $longitude"
             val items = collectDataFromLinearLayout(linearLayout)
 
             if (title.isEmpty() || date.isEmpty() || items.any { it.isEmpty() } || location.isEmpty()) {
@@ -263,6 +357,7 @@ class DonationUpdateActivity : AppCompatActivity() {
                                 title = title,
                                 donationImageUrl = imageUrl,
                                 location = location,
+                                coordinate = coordinate,
                                 organizerId = "users/${FirebaseAuth.getInstance().currentUser?.uid ?: ""}",
                                 deadline = Timestamp(deadline),
                                 itemsNeeded = items,
@@ -287,6 +382,7 @@ class DonationUpdateActivity : AppCompatActivity() {
                         title = title,
                         donationImageUrl = donation.donationImageUrl,
                         location = location,
+                        coordinate = coordinate,
                         organizerId = "users/${FirebaseAuth.getInstance().currentUser?.uid ?: ""}",
                         deadline = Timestamp(deadline),
                         itemsNeeded = items,
@@ -318,6 +414,21 @@ class DonationUpdateActivity : AppCompatActivity() {
             val tv_upload_image = findViewById<TextView>(R.id.tv_upload_image)
             tv_upload_image?.setTextColor(255)
         }
+    }
+
+    private fun configureWebView() {
+        val webSettings: WebSettings = webViewMap.settings
+        webSettings.javaScriptEnabled = true
+        webSettings.domStorageEnabled = true
+        webSettings.databaseEnabled = true
+        webSettings.allowContentAccess = true
+        webSettings.allowFileAccess = true
+
+        webViewMap.webChromeClient = WebChromeClient()
+        webViewMap.webViewClient = WebViewClient()
+
+        // Tambahkan antarmuka JavaScript baru ke WebView
+        webViewMap.addJavascriptInterface(WebAppInterface(), "Android")
     }
 
     fun getFileNameFromUrl(url: String): String {
@@ -354,5 +465,27 @@ class DonationUpdateActivity : AppCompatActivity() {
 
     companion object {
         const val IMAGE_PICK_CODE = 1000
+    }
+
+    private fun setSelectedLocation(lat: Double, lng: Double) {
+        latitude = lat
+        longitude = lng
+
+        // Memanggil fungsi JavaScript untuk menampilkan lokasi baru di peta
+        webViewMap.post {
+            webViewMap.loadUrl("javascript:showLocationOnMap();")
+        }
+    }
+
+    inner class WebAppInterface {
+        @JavascriptInterface
+        fun getLatitude(): Double {
+            return latitude
+        }
+
+        @JavascriptInterface
+        fun getLongitude(): Double {
+            return longitude
+        }
     }
 }

@@ -3,23 +3,28 @@ package com.example.helphandv10
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.DatePickerDialog
-import android.content.ContentValues
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.JavascriptInterface
+import android.webkit.WebChromeClient
+import android.webkit.WebSettings
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.RecyclerView
 import com.example.helphandv10.activity.MainActivity
 import com.example.helphandv10.activity.SuccessCreateDonation
 import com.example.helphandv10.adapter.NeedsAdapter
@@ -29,11 +34,10 @@ import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
-import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
-import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.Calendar
 import java.util.UUID
+
 
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
@@ -42,11 +46,13 @@ class CreateFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
 
+    private var latitude: Double = 0.0
+    private var longitude: Double = 0.0
     private val addViewModel: AddViewModel by viewModel()
     private lateinit var storageReference: StorageReference
     private lateinit var imageUri: Uri
-
     private lateinit var needsAdapter: NeedsAdapter
+    private lateinit var webViewMap: WebView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,20 +66,82 @@ class CreateFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_create, container, false)
+        val view = inflater.inflate(R.layout.fragment_create, container, false)
+
+        webViewMap = view.findViewById(R.id.webview_map)
+
+        configureWebView()
+
+        // Set nilai default latitude dan longitude ke peta
+        webViewMap.loadUrl("javascript:setLocationOnMap(0, 0);")
+
+        return view
     }
 
-    companion object {
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            CreateFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    @SuppressLint("SetJavaScriptEnabled", "ClickableViewAccessibility")
+    private fun configureWebView() {
+        val webSettings: WebSettings = webViewMap.settings
+        webSettings.javaScriptEnabled = true
+        webSettings.domStorageEnabled = true
+        webSettings.databaseEnabled = true
+        webSettings.allowContentAccess = true
+        webSettings.allowFileAccess = true
+
+        webViewMap.webChromeClient = WebChromeClient()
+        webViewMap.webViewClient = WebViewClient()
+
+        // Enable JavaScript to call Android functions
+        webViewMap.addJavascriptInterface(WebAppInterface(), "Android")
+
+        // Load the Leaflet map HTML file from assets
+        webViewMap.loadUrl("file:///android_asset/leaflet_map.html")
+
+        // Menambahkan listener untuk mengatur scroll
+        webViewMap.setOnTouchListener { _, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    // Menonaktifkan scroll ketika user menyentuh WebView
+                    webViewMap.requestDisallowInterceptTouchEvent(true)
+                }
+                MotionEvent.ACTION_UP -> {
+                    // Mengaktifkan kembali scroll setelah user melepaskan sentuhan
+                    webViewMap.requestDisallowInterceptTouchEvent(false)
+                    // Panggil performClick untuk menangani performClick yang diharapkan oleh WebView
+                    webViewMap.performClick()
                 }
             }
+            false
+        }
 
-        const val IMAGE_PICK_CODE = 1000
+        webViewMap.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView?, url: String?) {
+                super.onPageFinished(view, url)
+                // Set latitude dan longitude ke nilai dari input field
+                webViewMap.loadUrl("javascript:showLocationOnMap();")
+            }
+        }
+    }
+
+    private fun setSelectedLocation(lat: Double, lng: Double) {
+        latitude = lat
+        longitude = lng
+
+        // Memanggil fungsi JavaScript untuk menampilkan lokasi baru di peta
+        webViewMap.post {
+            webViewMap.loadUrl("javascript:showLocationOnMap();")
+        }
+    }
+
+    inner class WebAppInterface {
+        @JavascriptInterface
+        fun getLatitude(): Double {
+            return latitude
+        }
+
+        @JavascriptInterface
+        fun getLongitude(): Double {
+            return longitude
+        }
     }
 
     @SuppressLint("ResourceAsColor", "ClickableViewAccessibility")
@@ -82,7 +150,7 @@ class CreateFragment : Fragment() {
 
         val et_title = view.findViewById<EditText>(R.id.et_create_title)
         val et_date = view.findViewById<EditText>(R.id.et_create_date)
-        val et_location = view.findViewById<EditText>(R.id.et_create_location)
+        val et_location = view.findViewById<EditText>(R.id.et_create_address)
         val cl_image = view.findViewById<ConstraintLayout>(R.id.cl_create_image)
         val btn_create = view.findViewById<ConstraintLayout>(R.id.cl_btn_create)
         val btn_create_text = view.findViewById<TextView>(R.id.btn_create_text)
@@ -99,7 +167,6 @@ class CreateFragment : Fragment() {
 
         fun addNewInputField() {
             val newItemView = LayoutInflater.from(requireContext()).inflate(R.layout.item_need, linearLayout, false)
-            val needEditText = linearLayout_in.findViewById<EditText>(R.id.et_needs)
 
             newItemView.findViewById<ImageView>(R.id.btnDelNeed).setOnClickListener {
                 linearLayout.removeView(newItemView)
@@ -142,6 +209,44 @@ class CreateFragment : Fragment() {
             addNewInputField()
         }
 
+        // Mendapatkan referensi EditText untuk latitude dan longitude
+        val etLatitude = view.findViewById<EditText>(R.id.et_latitude)
+        val etLongitude = view.findViewById<EditText>(R.id.et_longitude)
+
+        // Menambahkan pendengar acara (event listener) ke EditText untuk latitude
+        etLatitude.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // Tidak perlu melakukan apa pun sebelum teks berubah
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // Tidak perlu melakukan apa pun saat teks berubah
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                // Panggil setSelectedLocation() dengan nilai latitude yang baru
+                val latitude = s?.toString()?.toDoubleOrNull() ?: return // Mengonversi teks ke Double
+                setSelectedLocation(latitude, longitude)
+            }
+        })
+
+        // Menambahkan pendengar acara (event listener) ke EditText untuk longitude
+        etLongitude.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // Tidak perlu melakukan apa pun sebelum teks berubah
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // Tidak perlu melakukan apa pun saat teks berubah
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                // Panggil setSelectedLocation() dengan nilai longitude yang baru
+                val longitude = s?.toString()?.toDoubleOrNull() ?: return // Mengonversi teks ke Double
+                setSelectedLocation(latitude, longitude)
+            }
+        })
+
         et_date.setOnClickListener {
             showDatePickerDialog(et_date)
         }
@@ -177,10 +282,13 @@ class CreateFragment : Fragment() {
             val title = et_title.text.toString()
             val date = et_date.text.toString()
             val location = et_location.text.toString()
+            val latitude = etLatitude.text.toString()
+            val longitude = etLongitude.text.toString()
+            val coordinate = "$latitude, $longitude"
             val needs = collectDataFromLinearLayout(linearLayout)
             Log.d("NEEDS INPUT", needs.toString())
 
-            if (title.isEmpty() || date.isEmpty() || needs.any { it.isEmpty() } || location.isEmpty()) {
+            if (title.isEmpty() || date.isEmpty() || needs.any { it.isEmpty() } || location.isEmpty() || latitude.isEmpty() || longitude.isEmpty()) {
                 Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -221,6 +329,7 @@ class CreateFragment : Fragment() {
                             title = title,
                             donationImageUrl = imageUrl,
                             location = location,
+                            coordinate = coordinate,
                             organizerId = "users/${FirebaseAuth.getInstance().currentUser?.uid ?: ""}",
                             deadline = Timestamp(deadline),
                             itemsNeeded = needs,
@@ -290,5 +399,18 @@ class CreateFragment : Fragment() {
                 tv_upload_image?.visibility = View.GONE
             }
         }
+    }
+
+    companion object {
+        @JvmStatic
+        fun newInstance(param1: String, param2: String) =
+            CreateFragment().apply {
+                arguments = Bundle().apply {
+                    putString(ARG_PARAM1, param1)
+                    putString(ARG_PARAM2, param2)
+                }
+            }
+
+        const val IMAGE_PICK_CODE = 1000
     }
 }

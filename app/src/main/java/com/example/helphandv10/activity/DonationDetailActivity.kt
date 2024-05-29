@@ -5,7 +5,13 @@ import android.content.ContentValues.TAG
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
+import android.webkit.JavascriptInterface
+import android.webkit.WebChromeClient
+import android.webkit.WebSettings
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -38,13 +44,15 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 class DonationDetailActivity : AppCompatActivity() {
+    private var latitude: Double = 0.0
+    private var longitude: Double = 0.0
+    private val viewModel: DetailViewModel by viewModels()
     private lateinit var itemsRecyclerView: RecyclerView
     private lateinit var itemNeededAdapter: ItemNeededAdapter
     private lateinit var auth: FirebaseAuth
+    private lateinit var webViewMap: WebView
 
-    private val viewModel: DetailViewModel by viewModels()
-
-    @SuppressLint("ResourceAsColor")
+    @SuppressLint("ResourceAsColor", "ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -57,6 +65,46 @@ class DonationDetailActivity : AppCompatActivity() {
 
         val donationDetail: Donations? = intent.getParcelableExtra("DONATION")
         val donationId = donationDetail?.id
+
+        val coordinate = donationDetail?.coordinate
+
+        if(coordinate != null) {
+            val parts = coordinate.split(",")
+            latitude = parts[0].trim().toDouble()
+            longitude = parts[1].trim().toDouble()
+        }
+
+        // Initialize WebView
+        webViewMap = findViewById(R.id.webview_map)
+        configureWebView()
+
+        // Load Leaflet map HTML file from assets
+        webViewMap.loadUrl("file:///android_asset/leaflet_map.html")
+
+        // Menambahkan listener untuk mengatur scroll
+        webViewMap.setOnTouchListener { _, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    // Menonaktifkan scroll ketika user menyentuh WebView
+                    webViewMap.requestDisallowInterceptTouchEvent(true)
+                }
+                MotionEvent.ACTION_UP -> {
+                    // Mengaktifkan kembali scroll setelah user melepaskan sentuhan
+                    webViewMap.requestDisallowInterceptTouchEvent(false)
+                    // Panggil performClick untuk menangani performClick yang diharapkan oleh WebView
+                    webViewMap.performClick()
+                }
+            }
+            false
+        }
+
+        webViewMap.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView?, url: String?) {
+                super.onPageFinished(view, url)
+                // Set latitude dan longitude ke nilai dari input field
+                webViewMap.loadUrl("javascript:showLocationOnMap();")
+            }
+        }
 
         donationId?.let { id ->
             lifecycleScope.launch {
@@ -200,6 +248,21 @@ class DonationDetailActivity : AppCompatActivity() {
         }
     }
 
+    private fun configureWebView() {
+        val webSettings: WebSettings = webViewMap.settings
+        webSettings.javaScriptEnabled = true
+        webSettings.domStorageEnabled = true
+        webSettings.databaseEnabled = true
+        webSettings.allowContentAccess = true
+        webSettings.allowFileAccess = true
+
+        webViewMap.webChromeClient = WebChromeClient()
+        webViewMap.webViewClient = WebViewClient()
+
+        // Tambahkan antarmuka JavaScript baru ke WebView
+        webViewMap.addJavascriptInterface(WebAppInterface(), "Android")
+    }
+
     private fun handleErrorMessage(message: String?) {
         // Penanganan kesalahan saat mengambil detail donasi
         Toast.makeText(this@DonationDetailActivity, "Error: $message", Toast.LENGTH_SHORT).show()
@@ -211,5 +274,17 @@ class DonationDetailActivity : AppCompatActivity() {
         val localDateTime = timestamp.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
         // Menggunakan DateTimeFormatter untuk memformat LocalDateTime
         return localDateTime.format(formatter)
+    }
+
+    inner class WebAppInterface {
+        @JavascriptInterface
+        fun getLatitude(): Double {
+            return latitude
+        }
+
+        @JavascriptInterface
+        fun getLongitude(): Double {
+            return longitude
+        }
     }
 }

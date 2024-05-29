@@ -67,5 +67,5 @@ dependencies {
     implementation(libs.koin.android)
 
     implementation(libs.glide)
-    implementation ("com.github.yshrsmz:keyboardvisibilityevent:3.0.0-RC3")
+    implementation (libs.keyboardvisibilityevent)
 }

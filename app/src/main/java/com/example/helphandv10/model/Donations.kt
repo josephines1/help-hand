@@ -17,6 +17,7 @@ data class Donations(
     val title: String,
     val donationImageUrl: String,
     val location: String,
+    val coordinate: String,
     val organizerId: String,
     val deadline: Timestamp? = null,
     val itemsNeeded: List<String>,
@@ -27,6 +28,7 @@ data class Donations(
         title = "",
         donationImageUrl = "",
         location = "",
+        coordinate = "0, 0",
         organizerId = "",
         deadline = Timestamp.now(),
         itemsNeeded = emptyList(),
@@ -40,6 +42,7 @@ data class Donations(
             parcel.writeString(title)
             parcel.writeString(donationImageUrl)
             parcel.writeString(location)
+            parcel.writeString(coordinate)
             parcel.writeString(organizerId)
             parcel.writeParcelable(deadline, flags)
             parcel.writeStringList(itemsNeeded)
@@ -59,6 +62,7 @@ data class Donations(
             val title = parcel.readString() ?: ""
             val donationImageUrl = parcel.readString() ?: ""
             val location = parcel.readString() ?: ""
+            val coordinate = parcel.readString() ?: ""
             val organizerId = parcel.readString() ?: ""
             val deadline = parcel.readParcelable(Timestamp::class.java.classLoader) ?: Timestamp.now()
             val itemsNeeded = parcel.createStringArrayList() ?: emptyList()
@@ -81,6 +85,7 @@ data class Donations(
                 title = title,
                 donationImageUrl = donationImageUrl,
                 location = location,
+                coordinate = coordinate,
                 organizerId = organizerId,
                 deadline = deadline,
                 itemsNeeded = itemsNeeded,

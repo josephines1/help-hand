@@ -62,6 +62,7 @@ class DonationRepository(
                     "title" to donation.title,
                     "donationImageUrl" to imageUrl,
                     "location" to donation.location,
+                    "coordinate" to donation.coordinate,
                     "organizerId" to donation.organizerId,
                     "deadline" to donation.deadline,
                     "itemsNeeded" to donation.itemsNeeded,
