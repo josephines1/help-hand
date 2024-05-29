@@ -2,7 +2,9 @@ package com.example.helphandv10
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
 import android.app.DatePickerDialog
+import android.content.ContentValues
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -30,8 +32,10 @@ import com.example.helphandv10.activity.SuccessCreateDonation
 import com.example.helphandv10.adapter.NeedsAdapter
 import com.example.helphandv10.model.Donations
 import com.example.helphandv10.viewmodel.donation.AddViewModel
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -76,6 +80,34 @@ class CreateFragment : Fragment() {
         webViewMap.loadUrl("javascript:setLocationOnMap(0, 0);")
 
         return view
+    }
+
+    interface PhoneNumberCheckCallback {
+        fun onCheckComplete(isRegistered: Boolean)
+    }
+
+    private fun isPhoneNumberRegistered(callback: PhoneNumberCheckCallback) {
+        val user = FirebaseAuth.getInstance().currentUser
+        val userId = user?.uid
+        val userRef = userId?.let {
+            FirebaseFirestore.getInstance().collection("users").document(it)
+        }
+
+        userRef?.get()
+            ?.addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    val phoneNumber = document.getString("phoneNumber")
+                    val isValidPhoneNumber = !phoneNumber.isNullOrEmpty() && phoneNumber != "-"
+                    callback.onCheckComplete(isValidPhoneNumber)
+                } else {
+                    callback.onCheckComplete(false)
+                }
+            }
+            ?.addOnFailureListener { exception ->
+                // Handle the error
+                Log.e("TAG", "Error getting user document", exception)
+                callback.onCheckComplete(false)
+            }
     }
 
     @SuppressLint("SetJavaScriptEnabled", "ClickableViewAccessibility")
@@ -144,10 +176,65 @@ class CreateFragment : Fragment() {
         }
     }
 
+    private fun replaceFragment(fragment: Fragment, itemId: Int) {
+        val fragmentManager = requireActivity().supportFragmentManager
+        val transaction = fragmentManager.beginTransaction()
+        transaction.replace(R.id.f_create, fragment)
+        transaction.addToBackStack(null)
+        transaction.commit()
+
+        // Mengubah item terpilih di BottomNavigationView
+        val bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.nav_bottom)
+        bottomNav.selectedItemId = itemId
+    }
+
+    private fun showPhoneNumberDialog() {
+        val builder = AlertDialog.Builder(requireContext())
+        val dialogView = layoutInflater.inflate(R.layout.custom_dialog_complete_profile, null)
+
+        val positiveButton = dialogView.findViewById<ConstraintLayout>(R.id.cl_btn_positive)
+        val negativeButton = dialogView.findViewById<ConstraintLayout>(R.id.cl_btn_negative)
+
+        builder.apply {
+            setView(dialogView)
+        }
+
+        val dialog = builder.create()
+
+        positiveButton.setOnClickListener {
+            replaceFragment(ProfileFragment(), R.id.nav_item_profile)
+            dialog.dismiss()
+        }
+
+        negativeButton.setOnClickListener {
+            requireActivity().supportFragmentManager.popBackStack()
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
     @SuppressLint("ResourceAsColor", "ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Check if the phone number is registered
+        isPhoneNumberRegistered(object : PhoneNumberCheckCallback {
+            override fun onCheckComplete(isRegistered: Boolean) {
+                if (!isRegistered) {
+                    // Show the dialog and return to prevent further initialization
+                    showPhoneNumberDialog()
+                    return
+                } else {
+                    // Initialize your view components if the phone number is registered
+                    initializeViewComponents(view)
+                }
+            }
+        })
+    }
+
+    @SuppressLint("ResourceAsColor")
+    private fun initializeViewComponents(view: View) {
         val et_title = view.findViewById<EditText>(R.id.et_create_title)
         val et_date = view.findViewById<EditText>(R.id.et_create_date)
         val et_location = view.findViewById<EditText>(R.id.et_create_address)

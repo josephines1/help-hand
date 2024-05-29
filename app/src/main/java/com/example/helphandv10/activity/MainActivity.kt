@@ -112,7 +112,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun adjustContentPadding(isNavBarVisible: Boolean) {
         val currentFragment = getCurrentFragment()
-        Log.d("CURRENT FRAGMENT", currentFragment.toString())
 
         var bottomPadding = if (isNavBarVisible) {
             resources.getDimensionPixelSize(R.dimen.m3_bottom_nav_min_height)
