@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
 import com.example.helphandv10.R
 import com.example.helphandv10.data.DonationRepository
 import com.example.helphandv10.databinding.ActivityTrackDonationBinding
@@ -60,10 +61,13 @@ class TrackDonationActivity : AppCompatActivity() {
     }
 
     private fun updateUI(donation: Donations) {
-        // Load image using Picasso
-        Picasso.get().load(donation.donationImageUrl).into(binding.donationImage1)
+        // Load image
+        Glide.with(this)
+            .load(donation.donationImageUrl)
+            .centerCrop()
+            .into(binding.donationImage1)
         binding.statusText.text = "Donation Sent"
-        binding.estimatedDate.text = "Estimated Arrival Date: ${donation.deadline.toDate()}"
+        binding.estimatedDate.text = "Estimated Arrival Date: ${donation.deadline?.toDate()}"
         binding.seeDetails.setOnClickListener {
             // Handle see details action
         }
