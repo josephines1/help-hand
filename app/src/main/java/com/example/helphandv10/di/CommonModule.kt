@@ -6,6 +6,7 @@ import com.example.helphandv10.data.DonationRepository
 import com.example.helphandv10.viewmodel.donation.HistoryViewModel
 import com.example.helphandv10.viewmodel.donation.UpdateViewModel
 import com.example.helphandv10.viewmodel.donation.DeleteViewModel
+import com.example.helphandv10.viewmodel.donation.DetailViewModel
 import com.example.helphandv10.viewmodel.donation.SearchViewModel
 import com.example.helphandv10.viewmodel.form.DonationReceiveViewModel
 import com.example.helphandv10.viewmodel.form.DonationSendViewModel
@@ -15,6 +16,7 @@ import org.koin.dsl.module
 
 val viewModelModule = module {
     viewModel { ListViewModel(get()) }
+    viewModel { DetailViewModel(get()) }
     viewModel { AddViewModel(get()) }
     viewModel { UpdateViewModel(get()) }
     viewModel { HistoryViewModel(get()) }

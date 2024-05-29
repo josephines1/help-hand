@@ -5,11 +5,13 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.DonationSendActivity">
+    tools:context=".activity.DonationSendActivity"
+    android:background="@color/background" >
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -18,10 +20,9 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:paddingHorizontal="24dp"
-                android:paddingTop="24dp">
+                android:paddingHorizontal="24dp" >
 
                 <ImageView
                     android:id="@+id/ic_back"
@@ -50,7 +51,7 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginHorizontal="24dp"
                 android:layout_marginTop="24dp"
                 android:background="@drawable/background_banner_home"
@@ -82,7 +83,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginHorizontal="24dp"
                 android:layout_marginTop="24dp"
                 android:orientation="vertical">
@@ -109,7 +110,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginHorizontal="24dp"
                 android:layout_marginTop="24dp"
                 android:orientation="vertical">
@@ -126,7 +127,9 @@
                     android:background="@drawable/edit_text_rounded_corner"
                     android:ems="10"
                     android:hint="Delivery Date"
-                    android:inputType="date"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:inputType="none"
                     android:padding="16dp"
                     android:paddingStart="24dp"
                     android:paddingEnd="24dp"
@@ -136,7 +139,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginHorizontal="24dp"
                 android:layout_marginTop="24dp"
                 android:orientation="vertical">
@@ -177,7 +180,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginHorizontal="24dp"
                 android:layout_marginTop="24dp"
                 android:orientation="vertical">
@@ -204,7 +207,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginHorizontal="24dp"
                 android:layout_marginTop="24dp"
                 android:orientation="vertical">
@@ -258,5 +261,5 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

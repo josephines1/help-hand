@@ -5,11 +5,21 @@ import android.app.DatePickerDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
-import android.view.View
+import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.ViewGroup
+import android.webkit.JavascriptInterface
+import android.webkit.WebChromeClient
+import android.webkit.WebSettings
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -20,6 +30,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.bumptech.glide.Glide
 import com.example.helphandv10.CreateFragment.Companion.IMAGE_PICK_CODE
 import com.example.helphandv10.R
+import com.example.helphandv10.adapter.NeedsAdapter
 import com.example.helphandv10.model.Donations
 import com.example.helphandv10.viewmodel.donation.UpdateViewModel
 import com.google.firebase.Timestamp
@@ -35,11 +46,15 @@ import java.util.UUID
 
 class DonationUpdateActivity : AppCompatActivity() {
 
+    private var latitude: Double = 0.0
+    private var longitude: Double = 0.0
     private val updateViewModel: UpdateViewModel by viewModel()
     private lateinit var storageReference: StorageReference
     private lateinit var imageUri: Uri
+    private lateinit var needsAdapter: NeedsAdapter
+    private lateinit var webViewMap: WebView
 
-    @SuppressLint("ResourceAsColor")
+    @SuppressLint("ResourceAsColor", "ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -48,6 +63,38 @@ class DonationUpdateActivity : AppCompatActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
+        }
+
+        // Initialize WebView
+        webViewMap = findViewById(R.id.webview_map)
+        configureWebView()
+
+        // Load Leaflet map HTML file from assets
+        webViewMap.loadUrl("file:///android_asset/leaflet_map.html")
+
+        // Menambahkan listener untuk mengatur scroll
+        webViewMap.setOnTouchListener { _, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    // Menonaktifkan scroll ketika user menyentuh WebView
+                    webViewMap.requestDisallowInterceptTouchEvent(true)
+                }
+                MotionEvent.ACTION_UP -> {
+                    // Mengaktifkan kembali scroll setelah user melepaskan sentuhan
+                    webViewMap.requestDisallowInterceptTouchEvent(false)
+                    // Panggil performClick untuk menangani performClick yang diharapkan oleh WebView
+                    webViewMap.performClick()
+                }
+            }
+            false
+        }
+
+        webViewMap.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView?, url: String?) {
+                super.onPageFinished(view, url)
+                // Set latitude dan longitude ke nilai dari input field
+                webViewMap.loadUrl("javascript:showLocationOnMap();")
+            }
         }
 
         val iconBack = findViewById<ImageView>(R.id.ic_back)
@@ -64,19 +111,80 @@ class DonationUpdateActivity : AppCompatActivity() {
         val et_title = findViewById<EditText>(R.id.et_update_title)
         val et_date = findViewById<EditText>(R.id.et_update_date)
         val et_location = findViewById<EditText>(R.id.et_update_location)
-        val et_items = findViewById<EditText>(R.id.et_update_items)
         val btn_update = findViewById<ConstraintLayout>(R.id.cl_btn_update)
         val btn_update_text = findViewById<TextView>(R.id.btn_update_text)
         val cl_upload_image = findViewById<ConstraintLayout>(R.id.cl_upload_image)
         val iv_preview = findViewById<ImageView>(R.id.iv_preview)
+        val linearLayout = findViewById<LinearLayout>(R.id.linearLayout)
 
-        val initialMarginBottom = resources.getDimensionPixelSize(R.dimen.m3_bottom_nav_min_height)
-        val additionalMargin = (24 * resources.displayMetrics.density + 0.5f).toInt()
-        val newMarginBottom = initialMarginBottom + additionalMargin
-
+        val margin = (12 * resources.displayMetrics.density + 0.5f).toInt()
         val params = btn_update.layoutParams as ViewGroup.MarginLayoutParams
-        params.bottomMargin = newMarginBottom
+        params.bottomMargin = margin
         btn_update.layoutParams = params
+
+        needsAdapter = NeedsAdapter(mutableListOf())
+
+        fun addNewInputField(needText: String = "", tag: Int) {
+            val newItemView = LayoutInflater.from(this).inflate(R.layout.item_need, linearLayout, false)
+            val needEditText = newItemView.findViewById<EditText>(R.id.et_needs)
+            needEditText.setText(needText)
+            needEditText.setTag(tag)
+
+            newItemView.findViewById<ImageButton>(R.id.btnDelNeed).setOnClickListener {
+                linearLayout.removeView(newItemView)
+            }
+
+            linearLayout.addView(newItemView)
+        }
+
+        // Initial need field
+        val etInitialNeed = findViewById<EditText>(R.id.et_needs)
+        etInitialNeed.setTag(0)
+
+        // Add initial need data if available
+        donation?.itemsNeeded?.firstOrNull()?.let {
+            etInitialNeed.setText(it)
+        }
+
+        // Add any additional needs
+        donation?.itemsNeeded?.drop(1)?.forEachIndexed { index, item ->
+            addNewInputField(item, index + 1)
+        }
+
+        // Menambahkan onClickListener untuk tombol tambah Need
+        val btnAddNeed = findViewById<ImageView>(R.id.btnAddNeed)
+        btnAddNeed.setOnClickListener {
+            // Check if any EditText is empty before adding a new field
+            var allFieldsFilled = true
+            for (i in 0 until linearLayout.childCount) {
+                val view = linearLayout.getChildAt(i)
+                if (view is LinearLayout) {
+                    for (j in 0 until view.childCount) {
+                        val innerView = view.getChildAt(j)
+                        if (innerView is EditText && innerView.text.toString().isEmpty()) {
+                            allFieldsFilled = false
+                            break
+                        }
+                    }
+                }
+                if (view is EditText && view.text.toString().isEmpty()) {
+                    allFieldsFilled = false
+                    break
+                }
+            }
+
+            if (!allFieldsFilled) {
+                Toast.makeText(
+                    this,
+                    "Please fill in all item needs before adding a new one",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@setOnClickListener
+            }
+
+            val newTag = linearLayout.childCount
+            addNewInputField(tag = newTag)
+        }
 
         // Set up Firebase Cloud Storage
         storageReference = FirebaseStorage.getInstance().reference
@@ -87,6 +195,56 @@ class DonationUpdateActivity : AppCompatActivity() {
             intent.type = "image/*"
             startActivityForResult(intent, IMAGE_PICK_CODE)
         }
+
+        // Mendapatkan referensi EditText untuk latitude dan longitude
+        val etLatitude = findViewById<EditText>(R.id.et_latitude)
+        val etLongitude = findViewById<EditText>(R.id.et_longitude)
+
+        val coordinate = donation?.coordinate
+
+        if(coordinate != null) {
+            val parts = coordinate.split(",")
+            latitude = parts[0].trim().toDouble()
+            longitude = parts[1].trim().toDouble()
+        }
+
+        // Set data awal coordinate ke dalam EditText
+        etLatitude.setText(latitude.toString())
+        etLongitude.setText(longitude.toString())
+
+        // Menambahkan pendengar acara (event listener) ke EditText untuk latitude
+        etLatitude.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // Tidak perlu melakukan apa pun sebelum teks berubah
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // Tidak perlu melakukan apa pun saat teks berubah
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                // Panggil setSelectedLocation() dengan nilai latitude yang baru
+                val latitude = s?.toString()?.toDoubleOrNull() ?: return // Mengonversi teks ke Double
+                setSelectedLocation(latitude, longitude)
+            }
+        })
+
+        // Menambahkan pendengar acara (event listener) ke EditText untuk longitude
+        etLongitude.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // Tidak perlu melakukan apa pun sebelum teks berubah
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // Tidak perlu melakukan apa pun saat teks berubah
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                // Panggil setSelectedLocation() dengan nilai longitude yang baru
+                val longitude = s?.toString()?.toDoubleOrNull() ?: return // Mengonversi teks ke Double
+                setSelectedLocation(latitude, longitude)
+            }
+        })
 
         et_date.setOnClickListener {
             showDatePickerDialog(et_date)
@@ -101,10 +259,6 @@ class DonationUpdateActivity : AppCompatActivity() {
             et_date.setText(it.toFormattedDate())
         }
 
-        // Tampilkan daftar item
-        val itemsString = donation?.itemsNeeded?.joinToString(", ") // Menggabungkan item dengan koma
-        et_items.setText(itemsString)
-
         Glide.with(this)
             .load(donation?.donationImageUrl)
             .centerCrop()
@@ -114,14 +268,36 @@ class DonationUpdateActivity : AppCompatActivity() {
             iv_preview.setImageResource(R.drawable.button_primary_light_rounded_corner)
         }
 
+        fun collectDataFromLinearLayout(container: LinearLayout): List<String> {
+            val inputData = mutableListOf<String>()
+            for (i in 0 until container.childCount) {
+                val view = container.getChildAt(i)
+                if (view is LinearLayout) {
+                    for (j in 0 until view.childCount) {
+                        val innerView = view.getChildAt(j)
+                        if (innerView is EditText) {
+                            inputData.add(innerView.text.toString())
+                        }
+                    }
+                }
+                if (view is EditText) {
+                    inputData.add(view.text.toString())
+                }
+            }
+            return inputData
+        }
+
         btn_update.setOnClickListener {
             val currentDonation = donation
             val title = et_title.text.toString()
             val date = et_date.text.toString()
             val location = et_location.text.toString()
-            val items = et_items.text.toString().split(",").map { it.trim() }
+            val latitude = etLatitude.text.toString()
+            val longitude = etLongitude.text.toString()
+            val coordinate = "$latitude, $longitude"
+            val items = collectDataFromLinearLayout(linearLayout)
 
-            if (title.isEmpty() || date.isEmpty() || items.isEmpty() || location.isEmpty()) {
+            if (title.isEmpty() || date.isEmpty() || items.any { it.isEmpty() } || location.isEmpty()) {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -141,6 +317,9 @@ class DonationUpdateActivity : AppCompatActivity() {
 
             if (deadline == null) {
                 Toast.makeText(this, "Invalid deadline format", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            } else if (Timestamp(deadline) <= Timestamp.now()) {
+                Toast.makeText(this, "Deadline cannot be dated before today.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -178,6 +357,7 @@ class DonationUpdateActivity : AppCompatActivity() {
                                 title = title,
                                 donationImageUrl = imageUrl,
                                 location = location,
+                                coordinate = coordinate,
                                 organizerId = "users/${FirebaseAuth.getInstance().currentUser?.uid ?: ""}",
                                 deadline = Timestamp(deadline),
                                 itemsNeeded = items,
@@ -202,6 +382,7 @@ class DonationUpdateActivity : AppCompatActivity() {
                         title = title,
                         donationImageUrl = donation.donationImageUrl,
                         location = location,
+                        coordinate = coordinate,
                         organizerId = "users/${FirebaseAuth.getInstance().currentUser?.uid ?: ""}",
                         deadline = Timestamp(deadline),
                         itemsNeeded = items,
@@ -233,6 +414,21 @@ class DonationUpdateActivity : AppCompatActivity() {
             val tv_upload_image = findViewById<TextView>(R.id.tv_upload_image)
             tv_upload_image?.setTextColor(255)
         }
+    }
+
+    private fun configureWebView() {
+        val webSettings: WebSettings = webViewMap.settings
+        webSettings.javaScriptEnabled = true
+        webSettings.domStorageEnabled = true
+        webSettings.databaseEnabled = true
+        webSettings.allowContentAccess = true
+        webSettings.allowFileAccess = true
+
+        webViewMap.webChromeClient = WebChromeClient()
+        webViewMap.webViewClient = WebViewClient()
+
+        // Tambahkan antarmuka JavaScript baru ke WebView
+        webViewMap.addJavascriptInterface(WebAppInterface(), "Android")
     }
 
     fun getFileNameFromUrl(url: String): String {
@@ -269,5 +465,27 @@ class DonationUpdateActivity : AppCompatActivity() {
 
     companion object {
         const val IMAGE_PICK_CODE = 1000
+    }
+
+    private fun setSelectedLocation(lat: Double, lng: Double) {
+        latitude = lat
+        longitude = lng
+
+        // Memanggil fungsi JavaScript untuk menampilkan lokasi baru di peta
+        webViewMap.post {
+            webViewMap.loadUrl("javascript:showLocationOnMap();")
+        }
+    }
+
+    inner class WebAppInterface {
+        @JavascriptInterface
+        fun getLatitude(): Double {
+            return latitude
+        }
+
+        @JavascriptInterface
+        fun getLongitude(): Double {
+            return longitude
+        }
     }
 }

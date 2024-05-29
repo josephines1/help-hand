@@ -45,12 +45,14 @@ class HistoryFragment : Fragment() {
     private lateinit var tvAsDonor: TextView
     private lateinit var tvAsOrganizer: TextView
     private lateinit var tvNoData: TextView
+    private lateinit var tvLoading: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
+            showAsOrganizer = it.getBoolean("showAsOrganizer", false)
         }
     }
 
@@ -69,13 +71,12 @@ class HistoryFragment : Fragment() {
         tvAsDonor = view.findViewById(R.id.tv_as_donor)
         tvAsOrganizer = view.findViewById(R.id.tv_as_organizer)
         tvNoData = view.findViewById(R.id.tvNoData)
+        tvLoading = view.findViewById(R.id.tvLoading)
 
         setupAdapter()
 
-        val initialPaddingBottom = resources.getDimensionPixelSize(R.dimen.m3_bottom_nav_min_height)
-        val additionalPadding = (48 * resources.displayMetrics.density + 0.5f).toInt()
-        val newPaddingBottom = initialPaddingBottom + additionalPadding
-        recyclerView.setPadding(recyclerView.paddingLeft, recyclerView.paddingTop, recyclerView.paddingRight, newPaddingBottom)
+        val padding = (48 * resources.displayMetrics.density + 0.5f).toInt()
+        recyclerView.setPadding(recyclerView.paddingLeft, recyclerView.paddingTop, recyclerView.paddingRight, padding)
 
         val firestoreDb = FirebaseFirestore.getInstance()
         val donationRepository = DonationRepository(firestoreDb)
@@ -84,6 +85,7 @@ class HistoryFragment : Fragment() {
 
         // Initial data load
         loadData()
+        updateTextViewColors()
 
         // Set up the listener for the TextView tv_as_organizer
         tvAsOrganizer.setOnClickListener {
@@ -117,13 +119,17 @@ class HistoryFragment : Fragment() {
     }
 
     private fun loadData() {
+        tvLoading.visibility = View.VISIBLE
+
         lifecycleScope.launch {
             if (showAsOrganizer) {
                 donationViewModel.getDonationsByOrganizer().collect { donations ->
+                    tvLoading.visibility = View.GONE
                     updateUI(donations)
                 }
             } else {
                 donationViewModel.getDonationsByDonor().collect { donations ->
+                    tvLoading.visibility = View.GONE
                     updateUI(donations)
                 }
             }
@@ -170,6 +176,7 @@ class HistoryFragment : Fragment() {
                 arguments = Bundle().apply {
                     putString(ARG_PARAM1, param1)
                     putString(ARG_PARAM2, param2)
+                    putBoolean("showAsOrganizer", false)
                 }
             }
     }

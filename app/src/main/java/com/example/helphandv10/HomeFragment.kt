@@ -1,5 +1,6 @@
 package com.example.helphandv10
 
+import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -8,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -38,9 +40,22 @@ class HomeFragment : Fragment() {
     private var param2: String? = null
 
     private lateinit var recyclerView: RecyclerView
+    private lateinit var cardLoading: CardView
     private val listViewModel: ListViewModel by viewModel()
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
+
+    private fun replaceFragment(fragment: Fragment, itemId: Int) {
+        val fragmentManager = requireActivity().supportFragmentManager
+        val transaction = fragmentManager.beginTransaction()
+        transaction.replace(R.id.fragment_container, fragment)
+        transaction.addToBackStack(null)
+        transaction.commit()
+
+        // Mengubah item terpilih di BottomNavigationView
+        val bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.nav_bottom)
+        bottomNav.selectedItemId = itemId
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,80 +73,8 @@ class HomeFragment : Fragment() {
         return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment HomeFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            HomeFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val btn_to_create = view.findViewById<ConstraintLayout>(R.id.cl_btn_home_create)
-
-        btn_to_create.setOnClickListener {
-            // Buat instance dari fragment Create
-            val createFragment = CreateFragment()
-
-            // Dapatkan instance FragmentManager
-            val fragmentManager = requireActivity().supportFragmentManager
-
-            // Mulai transaksi fragment
-            val transaction = fragmentManager.beginTransaction()
-
-            // Ganti fragment Home dengan fragment Create
-            transaction.replace(R.id.fragment_container, createFragment)
-
-            // Tambahkan transaksi ke back stack (jika ingin kembali ke fragment sebelumnya saat tombol back ditekan)
-            transaction.addToBackStack(null)
-
-            // Jalankan transaksi
-            transaction.commit()
-
-            // Mengubah item terpilih di BottomNavigationView
-            val bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.nav_bottom)
-            bottomNav.selectedItemId = R.id.nav_item_create
-        }
-
-        val btn_to_search = view.findViewById<ConstraintLayout>(R.id.cl_btn_home_search)
-
-        btn_to_search.setOnClickListener {
-            // Buat instance dari fragment Search
-            val searchFragment = SearchFragment()
-
-            // Dapatkan instance FragmentManager
-            val fragmentManager = requireActivity().supportFragmentManager
-
-            // Mulai transaksi fragment
-            val transaction = fragmentManager.beginTransaction()
-
-            // Ganti fragment Home dengan fragment Search
-            transaction.replace(R.id.fragment_container, searchFragment)
-
-            // Tambahkan transaksi ke back stack (jika ingin kembali ke fragment sebelumnya saat tombol back ditekan)
-            transaction.addToBackStack(null)
-
-            // Jalankan transaksi
-            transaction.commit()
-
-            // Mengubah item terpilih di BottomNavigationView
-            val bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.nav_bottom)
-            bottomNav.selectedItemId = R.id.nav_item_search
-        }
 
         val iv_userPhoto = view.findViewById<ImageView>(R.id.iv_userPhotoProfile)
         val tv_username = view.findViewById<TextView>(R.id.tv_username)
@@ -164,26 +107,88 @@ class HomeFragment : Fragment() {
                 }
         }
 
+        // Mengatur click listener untuk tombol create
+        val btn_to_create = view.findViewById<ConstraintLayout>(R.id.cl_btn_home_create)
+        btn_to_create.setOnClickListener {
+            replaceFragment(CreateFragment(), R.id.nav_item_create)
+        }
+
+        // Mengatur click listener untuk tombol search
+        val btn_to_search = view.findViewById<ConstraintLayout>(R.id.cl_btn_home_search)
+        btn_to_search.setOnClickListener {
+            replaceFragment(SearchFragment(), R.id.nav_item_search)
+        }
+
+        // Mengatur click listener untuk text view username
+        tv_username.setOnClickListener {
+            replaceFragment(ProfileFragment(), R.id.nav_item_profile)
+        }
+
         recyclerView = view.findViewById(R.id.rv_donations)
+        cardLoading = view.findViewById(R.id.cardLoading)
 
         listViewModel.getDonations()
 
         // Jika data terdeteksi
         listViewModel.donations.observe(viewLifecycleOwner, Observer { donationsList ->
-            Log.d("HomeFragment", donationsList.toString())
-            val adapter = ListAdapter(requireContext(), donationsList)
-            binding.rvDonations.adapter = adapter
-            val initialPaddingBottom = resources.getDimensionPixelSize(R.dimen.m3_bottom_nav_min_height)
-            val additionalPadding = (24 * resources.displayMetrics.density + 0.5f).toInt()
-            val newPaddingBottom = initialPaddingBottom + additionalPadding
-            recyclerView.setPadding(recyclerView.paddingLeft, recyclerView.paddingTop, recyclerView.paddingRight, newPaddingBottom)
+            cardLoading.visibility = View.GONE
 
+            // Debugging
+            Log.d("HomeFragment", donationsList.toString())
+
+            // Atur adapter recyclerview nya
+            val adapter = ListAdapter(requireContext(), donationsList.take(5))
+            binding.rvDonations.adapter = adapter
+
+            // Tampilkan recyclerview nya
             recyclerView.layoutManager = LinearLayoutManager(context)
             recyclerView.adapter = adapter
 
+            // Atur height recyclerview nya
             val layoutParams = recyclerView.layoutParams
             layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
             recyclerView.layoutParams = layoutParams
+
+            // Tambahkan tombol jika jumlah item lebih dari 5
+            if (donationsList.size > 5) {
+                val btnViewAll = view.findViewById<ConstraintLayout>(R.id.cl_btn_more)
+                btnViewAll.setOnClickListener {
+                    replaceFragment(SearchFragment(), R.id.nav_item_search)
+                }
+                btnViewAll.visibility = View.VISIBLE
+
+                // Atur margin nya
+                val margin = (112 * resources.displayMetrics.density + 0.5f).toInt()
+                val params = btnViewAll.layoutParams as ViewGroup.MarginLayoutParams
+                params.bottomMargin = margin
+                btnViewAll.layoutParams = params
+            } else {
+                // Atur padding nya
+                val initialPaddingBottom = resources.getDimensionPixelSize(R.dimen.m3_bottom_nav_min_height)
+                val additionalPadding = (24 * resources.displayMetrics.density + 0.5f).toInt()
+                val newPaddingBottom = initialPaddingBottom + additionalPadding
+                recyclerView.setPadding(recyclerView.paddingLeft, recyclerView.paddingTop, recyclerView.paddingRight, newPaddingBottom)
+            }
         })
+    }
+
+    companion object {
+        /**
+         * Use this factory method to create a new instance of
+         * this fragment using the provided parameters.
+         *
+         * @param param1 Parameter 1.
+         * @param param2 Parameter 2.
+         * @return A new instance of fragment HomeFragment.
+         */
+        // TODO: Rename and change types and number of parameters
+        @JvmStatic
+        fun newInstance(param1: String, param2: String) =
+            HomeFragment().apply {
+                arguments = Bundle().apply {
+                    putString(ARG_PARAM1, param1)
+                    putString(ARG_PARAM2, param2)
+                }
+            }
     }
 }

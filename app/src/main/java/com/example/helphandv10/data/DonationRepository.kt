@@ -2,15 +2,17 @@ package com.example.helphandv10.data
 
 import android.util.Log
 import com.example.helphandv10.model.Donations
-import com.example.helphandv10.model.DonorConfirmation
+import com.example.helphandv10.model.Donor
 import com.example.helphandv10.utils.Resource
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
+import java.util.Calendar
 
 class DonationRepository(
     private val firestoreDb: FirebaseFirestore
@@ -28,8 +30,23 @@ class DonationRepository(
     }
 
     fun getDonation(): Flow<List<Donations>> = flow {
+        val firestoreDb = FirebaseFirestore.getInstance()
         val ref = firestoreDb.collection("Donations")
-        val querySnapshot = ref.get().await()
+
+        // Dapatkan waktu saat ini (hari ini) tanpa waktu (jam, menit, detik)
+        val calendar = Calendar.getInstance()
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+        val today = calendar.time
+
+        // Konversi 'today' ke Timestamp
+        val todayTimestamp = Timestamp(today)
+
+        // Ambil data dengan filter deadline >= hari ini
+        val querySnapshot = ref.whereGreaterThanOrEqualTo("deadline", todayTimestamp).get().await()
+
         if (!querySnapshot.isEmpty) {
             emit(querySnapshot.toObjects(Donations::class.java))
         }
@@ -45,7 +62,7 @@ class DonationRepository(
                     "title" to donation.title,
                     "donationImageUrl" to imageUrl,
                     "location" to donation.location,
-                    "organizer" to donation.organizerId,
+                    "organizerId" to donation.organizerId,
                     "deadline" to donation.deadline,
                     "itemsNeeded" to donation.itemsNeeded,
                     "donors" to donation.donors,
@@ -129,19 +146,21 @@ class DonationRepository(
         userId: String,
         donationId: String,
         message: String,
-        deliveryDate: Timestamp,
+        expectedArrival: Timestamp,
         donationItemImageUrl: String,
-        deliveryMethod: String
+        deliveryMethod: String,
+        items: List<String>
     ): Flow<Resource<Unit>> = flow {
         val confirmationData = hashMapOf(
             "message" to message,
-            "plannedShippingDate" to deliveryDate,
+            "expectedArrival" to expectedArrival,
             "donationItemImageUrl" to donationItemImageUrl,
-            "shippingMethod" to deliveryMethod
+            "shippingMethod" to deliveryMethod,
+            "items" to items
         )
 
         val dataToSave = hashMapOf(
-            "confirmation" to confirmationData
+            "sentConfirmation" to confirmationData
         )
 
         val donationRef = firestoreDb.collection("Donations").document(donationId)
@@ -168,5 +187,31 @@ class DonationRepository(
         } catch (e: Exception) {
             emit(Resource.Error(e.localizedMessage ?: "Error fetching donors"))
         }
+    }
+
+    suspend fun updateDonation(donationId: String, donorId: String, updatedDonor: Donor): Flow<Resource<Unit>> = flow {
+        emit(Resource.Loading)
+        try {
+            val donationRef = firestoreDb.collection("Donations").document(donationId)
+            val donorRef = donationRef.collection("Donors").document(donorId)
+
+            donorRef.set(updatedDonor).await()
+
+            emit(Resource.Success(Unit))
+        } catch (e: Exception) {
+            emit(Resource.Error(e.localizedMessage ?: "Error updating donation"))
+        }
+    }
+
+    fun getDonorById(donationId: String, donorId: String, onSuccess: (DocumentSnapshot) -> Unit, onFailure: (Exception) -> Unit) {
+        val donorRef = firestoreDb.collection("Donations").document(donationId)
+            .collection("Donors").document(donorId)
+        donorRef.get()
+            .addOnSuccessListener { document ->
+                onSuccess(document)
+            }
+            .addOnFailureListener { exception ->
+                onFailure(exception)
+            }
     }
 }

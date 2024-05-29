@@ -10,7 +10,6 @@ import com.example.helphandv10.databinding.ActivityTrackDonationBinding
 import com.example.helphandv10.model.Donations
 import com.example.helphandv10.utils.Resource
 import com.google.firebase.firestore.FirebaseFirestore
-import com.squareup.picasso.Picasso
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 

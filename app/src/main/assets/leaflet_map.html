@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Leaflet Map</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <style>
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+<script>
+    var map = L.map('map').setView([51.505, -0.09], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    var marker;
+
+    // Fungsi untuk menangkap koordinat dari input field Android dan menampilkan lokasi pada peta
+    function showLocationOnMap() {
+        // Dapatkan nilai latitude dan longitude dari input field
+        var latitude = parseFloat(Android.getLatitude());
+        var longitude = parseFloat(Android.getLongitude());
+
+        // Atur posisi peta untuk menampilkan lokasi yang sesuai dengan koordinat yang dimasukkan
+        map.setView([latitude, longitude], 13); // Atur level zoom sesuai kebutuhan
+
+        // Tambahkan marker untuk menandai lokasi yang dipilih
+        if (marker) {
+            map.removeLayer(marker);
+        }
+        marker = L.marker([latitude, longitude]).addTo(map);
+    }
+
+    showLocationOnMap()
+</script>
+</body>
+</html>

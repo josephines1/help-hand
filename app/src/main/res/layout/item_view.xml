@@ -38,7 +38,7 @@
             android:id="@+id/tv_item_date"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="still open until 12 Desember 2045"
+            android:text="Deadline: YYYY-MM-DD"
             android:fontFamily="@font/poppins_regular"
             android:textSize="12dp"
             app:layout_constraintStart_toStartOf="parent"
