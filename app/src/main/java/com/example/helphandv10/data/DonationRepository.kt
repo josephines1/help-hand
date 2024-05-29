@@ -62,7 +62,6 @@ class DonationRepository(
                     "title" to donation.title,
                     "donationImageUrl" to imageUrl,
                     "location" to donation.location,
-                    "coordinate" to donation.coordinate,
                     "organizerId" to donation.organizerId,
                     "deadline" to donation.deadline,
                     "itemsNeeded" to donation.itemsNeeded,
@@ -214,21 +213,5 @@ class DonationRepository(
             .addOnFailureListener { exception ->
                 onFailure(exception)
             }
-    }
-
-    fun getDonationById(donationId: String): Flow<Resource<Donations>> = flow {
-        emit(Resource.Loading)
-        try {
-            val donationRef = firestoreDb.collection("Donations").document(donationId)
-            val snapshot = donationRef.get().await()
-            val donation = snapshot.toObject<Donations>()
-            if (donation != null) {
-                emit(Resource.Success(donation))
-            } else {
-                emit(Resource.Error("Donation not found"))
-            }
-        } catch (e: Exception) {
-            emit(Resource.Error(e.localizedMessage ?: "Error fetching donation"))
-        }
     }
 }
