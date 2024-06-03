@@ -118,7 +118,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Date Until (YYYY-MM-DD)" />
+                    android:text="Deadline (YYYY-MM-DD)" />
 
                 <EditText
                     android:id="@+id/et_update_date"
@@ -307,7 +307,7 @@
                             android:layout_height="wrap_content"
                             android:background="@drawable/edit_text_rounded_corner"
                             android:ems="10"
-                            android:hint="Items Needed"
+                            android:hint="Items"
                             android:inputType="text"
                             android:padding="16dp"
                             android:paddingStart="24dp"

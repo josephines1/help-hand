@@ -153,6 +153,10 @@ class ManageDonationActivity<Button> : AppCompatActivity() {
         val iconBack = findViewById<ImageView>(R.id.ic_back)
 
         iconBack.setOnClickListener{
+            val intent = Intent(this, MainActivity::class.java).apply {
+                putExtra("showHistoryFragment", true)
+            }
+            startActivity(intent)
             finish()
         }
 
