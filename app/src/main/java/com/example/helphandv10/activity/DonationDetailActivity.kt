@@ -37,7 +37,6 @@ import com.example.helphandv10.viewmodel.donation.HistoryViewModelFactory
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -220,6 +219,12 @@ class DonationDetailActivity : AppCompatActivity() {
 
                     // Menampilkan text view untuk melacak donasi
                     tvTrackDonation.visibility = View.VISIBLE
+                    tvTrackDonation.setOnClickListener{
+                        startActivity(Intent(this@DonationDetailActivity, TrackDonationActivity::class.java).apply {
+                            putExtra("donationId", donationDetail.id)
+                        })
+                        finish()
+                    }
 
                 } else if (deadline != null && deadline < Timestamp.now()) {
                     // Jika deadline sudah lewat, atur teks tombol menjadi "Closed" dan nonaktifkan tombol
@@ -268,7 +273,7 @@ class DonationDetailActivity : AppCompatActivity() {
         Toast.makeText(this@DonationDetailActivity, "Error: $message", Toast.LENGTH_SHORT).show()
     }
 
-    private fun formatTimestamp(timestamp: com.google.firebase.Timestamp): String {
+    private fun formatTimestamp(timestamp: Timestamp): String {
         val formatter = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale("id", "ID"))
         // Mengonversi Timestamp ke LocalDateTime
         val localDateTime = timestamp.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()

@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.helphandv10.model.Donations
 import com.example.helphandv10.model.Donor
 import com.example.helphandv10.utils.Resource
+import com.google.android.gms.tasks.Task
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
@@ -229,5 +230,13 @@ class DonationRepository(
         } catch (e: Exception) {
             emit(Resource.Error(e.localizedMessage ?: "Error fetching donation"))
         }
+    }
+
+    fun getDonorConfirmation(donationId: String, userId: String): Task<DocumentSnapshot> {
+        return firestoreDb.collection("Donations")
+            .document(donationId)
+            .collection("Donors")
+            .document(userId)
+            .get()
     }
 }

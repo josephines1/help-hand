@@ -8,6 +8,7 @@ import com.example.helphandv10.viewmodel.donation.UpdateViewModel
 import com.example.helphandv10.viewmodel.donation.DeleteViewModel
 import com.example.helphandv10.viewmodel.donation.DetailViewModel
 import com.example.helphandv10.viewmodel.donation.SearchViewModel
+import com.example.helphandv10.viewmodel.donation.TrackDonationViewModel
 import com.example.helphandv10.viewmodel.form.DonationReceiveViewModel
 import com.example.helphandv10.viewmodel.form.DonationSendViewModel
 import com.example.helphandv10.viewmodel.form.ManageDonorsViewModel
@@ -25,6 +26,7 @@ val viewModelModule = module {
     viewModel { ManageDonorsViewModel(get(), get()) }
     viewModel { SearchViewModel(get()) }
     viewModel { DonationReceiveViewModel(get()) }
+    viewModel { TrackDonationViewModel(get()) }
 }
 
 val repositoryModule = module {

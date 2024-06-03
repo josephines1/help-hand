@@ -52,7 +52,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
-                android:padding="16dp">
+                android:layout_marginHorizontal="24dp">
 
                 <ImageView
                     android:id="@+id/donationImage1"
@@ -64,7 +64,8 @@
                 <RelativeLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/donationImage1">
+                    android:layout_below="@id/donationImage1"
+                    android:layout_marginTop="12dp">
 
                     <ImageView
                         android:id="@+id/checkIcon"
@@ -90,7 +91,7 @@
                         android:layout_marginTop="4dp"
                         android:layout_marginStart="8dp"
                         android:layout_toEndOf="@id/checkIcon"
-                        android:text="Estimated Arrival Date: 4 Mei 2024"
+                        android:text="Estimated Arrival Date: ..."
                         android:textSize="12sp" />
 
                     <TextView
@@ -113,7 +114,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/title"
                 android:layout_marginTop="32dp"
-                android:padding="16dp">
+                android:layout_marginHorizontal="24dp">
 
                 <ImageView
                     android:id="@+id/donationImage2"
@@ -127,7 +128,8 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_below="@id/donationImage2"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:layout_marginTop="12dp">
 
                     <ImageView
                         android:id="@+id/questionIcon"
@@ -144,6 +146,67 @@
                         android:layout_toEndOf="@id/questionIcon"
                         android:text="Waiting to organizer receive the donation"
                         android:textSize="12sp" />
+                </RelativeLayout>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/donationReceivedContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:layout_marginHorizontal="24dp">
+
+                <ImageView
+                    android:id="@+id/donationImage3"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:scaleType="centerCrop"
+                    android:background="@color/neutral_dark" />
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/donationImage3"
+                    android:layout_marginTop="12dp">
+
+                    <ImageView
+                        android:id="@+id/receivedIcon"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:src="@drawable/ic_check_circle" />
+
+                    <TextView
+                        android:id="@+id/statusText_received"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@id/receivedIcon"
+                        android:layout_marginStart="8dp"
+                        android:text="Donation Received"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/receivedDate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/statusText_received"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_toEndOf="@id/receivedIcon"
+                        android:text="Received on ..."
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/seeDetails_received"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/receivedDate"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_toEndOf="@id/receivedIcon"
+                        android:text="See Details"
+                        android:textSize="12sp"
+                        android:textColor="@android:color/holo_blue_dark" />
                 </RelativeLayout>
             </RelativeLayout>
 

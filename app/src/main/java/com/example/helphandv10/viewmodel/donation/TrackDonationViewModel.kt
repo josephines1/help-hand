@@ -1,41 +1,51 @@
-package com.example.helphandv10.ui
+package com.example.helphandv10.viewmodel.donation
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
 import com.example.helphandv10.data.DonationRepository
-import com.example.helphandv10.model.Donations
-import com.example.helphandv10.utils.Resource
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
-class TrackDonationViewModel(
-    private val repository: DonationRepository
-) : ViewModel() {
+class TrackDonationViewModel(private val donationRepository: DonationRepository) : ViewModel() {
+    constructor() : this(DonationRepository(FirebaseFirestore.getInstance()))
+    private val _donationStatus = MutableLiveData<String>()
+    val donationStatus: LiveData<String> get() = _donationStatus
 
-    private val _donations = MutableStateFlow<Resource<List<Donations>>>(Resource.Loading)
-    val donations: StateFlow<Resource<List<Donations>>> get() = _donations
+    private val _donationDetails = MutableLiveData<Map<String, Any>>()
+    val donationDetails: LiveData<Map<String, Any>> get() = _donationDetails
 
-    fun getDonationsByDonor() {
-        viewModelScope.launch {
-            repository.getDonationsByDonor().collect { result ->
-                _donations.value = Resource.Success(result)
+    fun checkDonationStatus(donationId: String) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+
+        donationRepository.getDonorConfirmation(donationId, userId)
+            .addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot.exists()) {
+                    val sentConfirmation = documentSnapshot.get("sentConfirmation") as? Map<*, *>
+                    val receivedConfirmation = documentSnapshot.get("receivedConfirmation") as? Map<*, *>
+
+                    _donationDetails.value = mapOf(
+                        "sentConfirmation" to (sentConfirmation ?: emptyMap<String, Any>()),
+                        "receivedConfirmation" to (receivedConfirmation ?: emptyMap<String, Any>())
+                    )
+
+                    when {
+                        sentConfirmation != null && receivedConfirmation != null -> {
+                            _donationStatus.value = "received"
+                        }
+                        sentConfirmation != null -> {
+                            _donationStatus.value = "sent"
+                        }
+                        else -> {
+                            _donationStatus.value = "waiting"
+                        }
+                    }
+                } else {
+                    _donationStatus.value = "undefined"
+                }
             }
-        }
-    }
-}
-
-class TrackDonationViewModelFactory(
-    private val repository: DonationRepository
-) : ViewModelProvider.Factory {
-
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return if (modelClass.isAssignableFrom(TrackDonationViewModel::class.java)) {
-            TrackDonationViewModel(repository) as T
-        } else {
-            throw IllegalArgumentException("Unknown ViewModel class")
-        }
+            .addOnFailureListener {
+                _donationStatus.value = "undefined"
+            }
     }
 }
