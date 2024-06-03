@@ -83,7 +83,7 @@ class ChangePasswordActivity : AppCompatActivity() {
                 .addOnCompleteListener { reauthTask ->
                     if (reauthTask.isSuccessful) {
                         // Update password
-                        currentUser.updatePassword(hashedPassword)
+                        currentUser.updatePassword(newPassword)
                             .addOnCompleteListener { updatePasswordTask ->
                                 if (updatePasswordTask.isSuccessful) {
                                     // Password updated successfully

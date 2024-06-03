@@ -31,7 +31,6 @@ class EditProfileActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_edit_profile)
 
         // Initialize Firestore and get current user
@@ -167,9 +166,10 @@ class EditProfileActivity : AppCompatActivity() {
     }
 
     private fun loadProfilePhoto(photoUrl: String?) {
-        if (!photoUrl.isNullOrEmpty()) {
+        if (!photoUrl.isNullOrEmpty() && photoUrl != "-") {
             Glide.with(this)
                 .load(photoUrl)
+                .centerCrop()
                 .into(findViewById<ImageView>(R.id.ivUserPhotoProfile))
         } else {
             // If the photo URL is null or empty, you can set a default placeholder image here
