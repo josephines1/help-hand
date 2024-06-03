@@ -1,9 +1,11 @@
-package com.example.helphandv10.ui
+package com.example.helphandv10.activity
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.example.helphandv10.databinding.ActivityDonationSendDetailBinding
+import com.google.firebase.firestore.FirebaseFirestore
 
 class DonationSendDetailActivity : AppCompatActivity() {
 
@@ -14,17 +16,35 @@ class DonationSendDetailActivity : AppCompatActivity() {
         binding = ActivityDonationSendDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val donorName = intent.getStringExtra("donorName")
+        val donorId = intent.getStringExtra("donorId")
         val messageFromDonor = intent.getStringExtra("messageFromDonor")
         val estimatedArrivalDate = intent.getStringExtra("estimatedArrivalDate")
         val donationImageUrl = intent.getStringExtra("donationImageUrl")
         val items = intent.getStringExtra("items")
         val deliveryMethod = intent.getStringExtra("deliveryMethod")
 
-        binding.tvDonatur.text = donorName
+        val firestore = FirebaseFirestore.getInstance()
+        var donorName = "..."
+
+        if (donorId != null) {
+            firestore.collection("users").document(donorId)
+                .get()
+                .addOnSuccessListener { document ->
+                    if (document != null && document.exists()) {
+                        donorName = document.getString("username").toString()
+                        binding.tvDonatur.text = donorName
+                    } else {
+                        binding.tvDonatur.text = "..."
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Log.e("DONATION SEND DETAIL ACTIVITY", e.toString())
+                }
+        }
+
         binding.tvMessageFromDonatur.text = messageFromDonor
         binding.tvArrivalDate.text = estimatedArrivalDate
-        Glide.with(this).load(donationImageUrl).into(binding.ivDonationImage)
+        Glide.with(this).load(donationImageUrl).centerCrop().into(binding.ivDonationImage)
         binding.tvItems.text = items
         binding.tvDeliveryMethod.text = deliveryMethod
 

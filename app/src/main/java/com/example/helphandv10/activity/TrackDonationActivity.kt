@@ -9,11 +9,8 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.helphandv10.R
-import com.example.helphandv10.ui.DonationSendDetailActivity
-import com.example.helphandv10.viewmodel.donation.DetailViewModel
 import com.example.helphandv10.viewmodel.donation.TrackDonationViewModel
 import com.google.firebase.Timestamp
 import java.time.ZoneId
@@ -89,9 +86,6 @@ class TrackDonationActivity : AppCompatActivity() {
                 val sentConfirmation = it["sentConfirmation"] as? Map<*, *>
                 val receivedConfirmation = it["receivedConfirmation"] as? Map<*, *>
 
-                Log.e("SENTCONFIRMATION", sentConfirmation.toString())
-                Log.e("receivedConfirmation", receivedConfirmation.toString())
-
                 // Set status text
                 if (receivedConfirmation != null && receivedConfirmation.isNotEmpty() && receivedConfirmation.any { it.value != null }) {
                         findViewById<TextView>(R.id.statusText_received).text = "Donation Received"
@@ -101,10 +95,10 @@ class TrackDonationActivity : AppCompatActivity() {
                 // Set date
                 if (receivedConfirmation != null && receivedConfirmation.isNotEmpty() && receivedConfirmation.any { it.value != null }) {
                     val receivedDate = receivedConfirmation["confirmationDate"]
-                    findViewById<TextView>(R.id.receivedDate).text = formatTimestamp(receivedDate as Timestamp)
+                    findViewById<TextView>(R.id.receivedDate).text = "Received on ${formatTimestamp(receivedDate as Timestamp)}"
                 }
                 val estimatedDate = sentConfirmation?.get("expectedArrival")
-                findViewById<TextView>(R.id.estimatedDate).text = formatTimestamp(estimatedDate as Timestamp)
+                findViewById<TextView>(R.id.estimatedDate).text = "Estimated to arrive on ${formatTimestamp(estimatedDate as Timestamp)}"
 
                 // load image
                 if (receivedConfirmation != null && receivedConfirmation.isNotEmpty() && receivedConfirmation.any { it.value != null }) {
@@ -122,21 +116,23 @@ class TrackDonationActivity : AppCompatActivity() {
 
                 // Setup see details button for sent donation
                 findViewById<View>(R.id.seeDetails).setOnClickListener {
-                    val intent = Intent(this, DonationSendDetailActivity::class.java)
-                    intent.putExtra("donorName", sentConfirmation["donorName"] as? String)
-                    intent.putExtra("messageFromDonor", sentConfirmation["messageFromDonor"] as? String)
-                    intent.putExtra("estimatedArrivalDate", estimatedDate?.let { formatTimestamp(it as Timestamp) })
-                    intent.putExtra("donationImageUrl", imageUrl)
-                    intent.putExtra("items", sentConfirmation["items"] as? String)
-                    intent.putExtra("deliveryMethod", sentConfirmation["deliveryMethod"] as? String)
-                    startActivity(intent)
+                    val intentToDetails = Intent(this, DonationSendDetailActivity::class.java)
+                    intentToDetails.putExtra("donorId", trackDonationViewModel.documentId)
+                    intentToDetails.putExtra("messageFromDonor", sentConfirmation["message"] as? String)
+                    intentToDetails.putExtra("estimatedArrivalDate",
+                        estimatedDate.let { formatTimestamp(it) })
+                    intentToDetails.putExtra("donationImageUrl", imageUrl)
+                    intentToDetails.putExtra("items", (sentConfirmation?.get("items") as? List<*>)?.joinToString(", "))
+                    intentToDetails.putExtra("deliveryMethod", sentConfirmation["shippingMethod"] as? String)
+
+                    startActivity(intentToDetails)
                 }
 
                 // Setup see details button for received donation
-                findViewById<View>(R.id.seeDetails).setOnClickListener {
+                findViewById<View>(R.id.seeDetails_received).setOnClickListener {
                     val intent = Intent(this, DonationReceivedDetailActivity::class.java)
                     intent.putExtra("confirmationDate", receivedConfirmation?.get("confirmationDate")?.let { formatTimestamp(it as Timestamp) })
-                    intent.putExtra("confirmationMessage", receivedConfirmation?.get("confirmationMessage") as? String)
+                    intent.putExtra("confirmationMessage", receivedConfirmation?.get("message") as? String)
                     intent.putExtra("donationImageUrl", receivedConfirmation?.get("receivedProofImageUrl") as? String)
                     startActivity(intent)
                 }

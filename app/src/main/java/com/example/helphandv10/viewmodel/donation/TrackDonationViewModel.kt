@@ -15,12 +15,15 @@ class TrackDonationViewModel(private val donationRepository: DonationRepository)
     private val _donationDetails = MutableLiveData<Map<String, Any>>()
     val donationDetails: LiveData<Map<String, Any>> get() = _donationDetails
 
+    var documentId: String? = null
+
     fun checkDonationStatus(donationId: String) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
         donationRepository.getDonorConfirmation(donationId, userId)
             .addOnSuccessListener { documentSnapshot ->
                 if (documentSnapshot.exists()) {
+                    documentId = documentSnapshot.id
                     val sentConfirmation = documentSnapshot.get("sentConfirmation") as? Map<*, *>
                     val receivedConfirmation = documentSnapshot.get("receivedConfirmation") as? Map<*, *>
 
