@@ -104,9 +104,6 @@ class DonationUpdateActivity : AppCompatActivity() {
         }
 
         val donation: Donations? = intent.getParcelableExtra("data")
-        if (donation != null) {
-            donation.id?.let { Log.d("ID ID ID ID: Update", it) }
-        }
 
         val et_title = findViewById<EditText>(R.id.et_update_title)
         val et_date = findViewById<EditText>(R.id.et_update_date)
@@ -137,16 +134,16 @@ class DonationUpdateActivity : AppCompatActivity() {
             linearLayout.addView(newItemView)
         }
 
-        // Initial need field
+        // Panggil komponen input need item yang pertama
         val etInitialNeed = findViewById<EditText>(R.id.et_needs)
         etInitialNeed.setTag(0)
 
-        // Add initial need data if available
+        // Iterasi need item yang pertama
         donation?.itemsNeeded?.firstOrNull()?.let {
             etInitialNeed.setText(it)
         }
 
-        // Add any additional needs
+        // Iterasi needs item lainnya
         donation?.itemsNeeded?.drop(1)?.forEachIndexed { index, item ->
             addNewInputField(item, index + 1)
         }
@@ -154,7 +151,6 @@ class DonationUpdateActivity : AppCompatActivity() {
         // Menambahkan onClickListener untuk tombol tambah Need
         val btnAddNeed = findViewById<ImageView>(R.id.btnAddNeed)
         btnAddNeed.setOnClickListener {
-            // Check if any EditText is empty before adding a new field
             var allFieldsFilled = true
             for (i in 0 until linearLayout.childCount) {
                 val view = linearLayout.getChildAt(i)
@@ -250,7 +246,7 @@ class DonationUpdateActivity : AppCompatActivity() {
             showDatePickerDialog(et_date)
         }
 
-        // Set data awal contact ke dalam EditText
+        // Set data awal ke dalam EditText
         et_title.setText(donation?.title)
         et_location.setText(donation?.location)
 
@@ -323,12 +319,12 @@ class DonationUpdateActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // if image changed
             if (currentDonation != null) {
                 btn_update_text.text = "Saving..."
                 btn_update_text.setTextColor(R.color.text)
                 btn_update.setBackgroundResource(R.drawable.button_neutral_rounded_corner)
 
+                // if image changed
                 if (::imageUri.isInitialized) {
 
                     if (currentDonation.donationImageUrl != null) {
@@ -351,7 +347,7 @@ class DonationUpdateActivity : AppCompatActivity() {
                         imageRef.downloadUrl.addOnSuccessListener { uri ->
                             val imageUrl = uri.toString()
 
-                            // Save the contact data to Firestore
+                            // Save the data to Firestore
                             val donationInput = Donations(
                                 id = donation.id,
                                 title = title,

@@ -31,9 +31,9 @@
         <activity
             android:name=".activity.ChangePasswordActivity"
             android:exported="false" />
-        <!-- <activity -->
-        <!-- android:name=".activity.TrackDonationActivity" -->
-        <!-- android:exported="false" /> -->
+        <activity
+             android:name=".activity.TrackDonationActivity"
+             android:exported="false" />
         <activity
             android:name=".activity.EditProfileActivity"
             android:exported="false" />
@@ -60,6 +60,9 @@
             android:exported="false" />
         <activity
             android:name=".activity.SuccessCreateDonation"
+            android:exported="false" />
+        <activity
+            android:name=".activity.SuccessRequestSendDonation"
             android:exported="false" />
         <activity
             android:name=".activity.DonationDetailActivity"

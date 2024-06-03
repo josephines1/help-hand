@@ -37,12 +37,14 @@ class HomeFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
 
+    // Menginisiasi variabel yang dibutuhkan
     private lateinit var recyclerView: RecyclerView
     private lateinit var cardLoading: CardView
     private val listViewModel: ListViewModel by viewModel()
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
+    // Function untuk berganti fragment
     private fun replaceFragment(fragment: Fragment, itemId: Int) {
         val fragmentManager = requireActivity().supportFragmentManager
         val transaction = fragmentManager.beginTransaction()
@@ -66,25 +68,24 @@ class HomeFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-
     ): View? {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
-
     }
-
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Mengambil layout untuk photo dan username
         val iv_userPhoto = view.findViewById<ImageView>(R.id.iv_userPhotoProfile)
         val tv_username = view.findViewById<TextView>(R.id.tv_username)
 
+        // Mendefinisikan Firestore Auth
         val firestore = FirebaseFirestore.getInstance()
-
         val uid = FirebaseAuth.getInstance().currentUser?.uid
 
+        // Mengambil data username dan photo user yang saat ini login
+        // dan menerapkan nya ke dalam layout
         if (uid != null) {
             firestore.collection("users").document(uid)
                 .get()
@@ -126,11 +127,11 @@ class HomeFragment : Fragment() {
             replaceFragment(ProfileFragment(), R.id.nav_item_profile)
         }
 
-
-
+        // Mendefinisikan variabel scope global
         recyclerView = view.findViewById(R.id.rv_donations)
         cardLoading = view.findViewById(R.id.cardLoading)
 
+        // Mengambil data donasi-donasi
         listViewModel.getDonations()
 
         // Jika data terdeteksi

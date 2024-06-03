@@ -51,6 +51,7 @@ class CreateFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
 
+    // Menginisialisasi variabel yang dibutuhkan
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
     private val addViewModel: AddViewModel by viewModel()
@@ -73,20 +74,24 @@ class CreateFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_create, container, false)
 
+        // Mencari elemen dengan ID webview_map
         webViewMap = view.findViewById(R.id.webview_map)
 
+        // panggil function configure web view
         configureWebView()
 
-        // Set nilai default latitude dan longitude ke peta
+        // Set nilai default latitude dan longitude ke peta ke fungsi JavaScript
         webViewMap.loadUrl("javascript:setLocationOnMap(0, 0);")
 
         return view
     }
 
+    // Mendefinisikan callback yang memiliki satu metode onCheckComplete
     interface PhoneNumberCheckCallback {
         fun onCheckComplete(isRegistered: Boolean)
     }
 
+    // Memeriksa apakah user yang saat ini login sudah mendaftarkan nomor telepon nya
     private fun isPhoneNumberRegistered(callback: PhoneNumberCheckCallback) {
         val user = FirebaseAuth.getInstance().currentUser
         val userId = user?.uid
@@ -113,6 +118,7 @@ class CreateFragment : Fragment() {
 
     @SuppressLint("SetJavaScriptEnabled", "ClickableViewAccessibility")
     private fun configureWebView() {
+        // Mengaktifkan berbagai pengaturan WebView seperti JavaScript, DOM Storage, dan akses file.
         val webSettings: WebSettings = webViewMap.settings
         webSettings.javaScriptEnabled = true
         webSettings.domStorageEnabled = true
@@ -120,13 +126,14 @@ class CreateFragment : Fragment() {
         webSettings.allowContentAccess = true
         webSettings.allowFileAccess = true
 
+        // Menetapkan WebChromeClient untuk mengelola bagian antarmuka dan WebViewClient untuk menangani navigasi halaman web.
         webViewMap.webChromeClient = WebChromeClient()
         webViewMap.webViewClient = WebViewClient()
 
-        // Enable JavaScript to call Android functions
+        // Izinkan JavaScript untuk memanggil function dari sistem Android
         webViewMap.addJavascriptInterface(WebAppInterface(), "Android")
 
-        // Load the Leaflet map HTML file from assets
+        // Memuat file leaflet dari folder asset
         webViewMap.loadUrl("file:///android_asset/leaflet_map.html")
 
         // Menambahkan listener untuk mengatur scroll
@@ -146,10 +153,10 @@ class CreateFragment : Fragment() {
             false
         }
 
+        // Menambahkan WebViewClient khusus yang memanggil fungsi JavaScript showLocationOnMap ketika halaman web selesai dimuat untuk menampilkan lokasi pada peta.
         webViewMap.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
-                // Set latitude dan longitude ke nilai dari input field
                 webViewMap.loadUrl("javascript:showLocationOnMap();")
             }
         }
@@ -175,18 +182,6 @@ class CreateFragment : Fragment() {
         fun getLongitude(): Double {
             return longitude
         }
-    }
-
-    private fun replaceFragment(fragment: Fragment, itemId: Int) {
-        val fragmentManager = requireActivity().supportFragmentManager
-        val transaction = fragmentManager.beginTransaction()
-        transaction.replace(R.id.f_create, fragment)
-        transaction.addToBackStack(null)
-        transaction.commit()
-
-        // Mengubah item terpilih di BottomNavigationView
-        val bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.nav_bottom)
-        bottomNav.selectedItemId = itemId
     }
 
     private fun showPhoneNumberDialog() {
@@ -244,7 +239,6 @@ class CreateFragment : Fragment() {
         val btn_create = view.findViewById<ConstraintLayout>(R.id.cl_btn_create)
         val btn_create_text = view.findViewById<TextView>(R.id.btn_create_text)
         val linearLayout = view.findViewById<LinearLayout>(R.id.linearLayout)
-        val linearLayout_in = view.findViewById<LinearLayout>(R.id.linearLayout_in)
 
         val margin = (12 * resources.displayMetrics.density + 0.5f).toInt()
 
@@ -347,6 +341,7 @@ class CreateFragment : Fragment() {
             startActivityForResult(intent, IMAGE_PICK_CODE)
         }
 
+        // collect dari multiple inputs
         fun collectDataFromLinearLayout(container: LinearLayout): List<String> {
             val inputData = mutableListOf<String>()
             // Iterasi melalui setiap child dari LinearLayout container
