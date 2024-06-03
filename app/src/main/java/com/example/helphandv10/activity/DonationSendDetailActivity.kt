@@ -1,21 +1,35 @@
-package com.example.helphandv10.activity
+package com.example.helphandv10.ui
 
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import com.example.helphandv10.R
+import com.bumptech.glide.Glide
+import com.example.helphandv10.databinding.ActivityDonationSendDetailBinding
 
 class DonationSendDetailActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityDonationSendDetailBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_donation_send_detail)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+        binding = ActivityDonationSendDetailBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        val donorName = intent.getStringExtra("donorName")
+        val messageFromDonor = intent.getStringExtra("messageFromDonor")
+        val estimatedArrivalDate = intent.getStringExtra("estimatedArrivalDate")
+        val donationImageUrl = intent.getStringExtra("donationImageUrl")
+        val items = intent.getStringExtra("items")
+        val deliveryMethod = intent.getStringExtra("deliveryMethod")
+
+        binding.tvDonatur.text = donorName
+        binding.tvMessageFromDonatur.text = messageFromDonor
+        binding.tvArrivalDate.text = estimatedArrivalDate
+        Glide.with(this).load(donationImageUrl).into(binding.ivDonationImage)
+        binding.tvItems.text = items
+        binding.tvDeliveryMethod.text = deliveryMethod
+
+        binding.icBack.setOnClickListener {
+            finish()
         }
     }
 }

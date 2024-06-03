@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.helphandv10.R
+import com.example.helphandv10.ui.DonationSendDetailActivity
 import com.example.helphandv10.viewmodel.donation.DetailViewModel
 import com.example.helphandv10.viewmodel.donation.TrackDonationViewModel
 import com.google.firebase.Timestamp
@@ -118,6 +119,27 @@ class TrackDonationActivity : AppCompatActivity() {
                     .load(imageUrl)
                     .centerCrop()
                     .into(findViewById(R.id.donationImage1))
+
+                // Setup see details button for sent donation
+                findViewById<View>(R.id.seeDetails).setOnClickListener {
+                    val intent = Intent(this, DonationSendDetailActivity::class.java)
+                    intent.putExtra("donorName", sentConfirmation["donorName"] as? String)
+                    intent.putExtra("messageFromDonor", sentConfirmation["messageFromDonor"] as? String)
+                    intent.putExtra("estimatedArrivalDate", estimatedDate?.let { formatTimestamp(it as Timestamp) })
+                    intent.putExtra("donationImageUrl", imageUrl)
+                    intent.putExtra("items", sentConfirmation["items"] as? String)
+                    intent.putExtra("deliveryMethod", sentConfirmation["deliveryMethod"] as? String)
+                    startActivity(intent)
+                }
+
+                // Setup see details button for received donation
+                findViewById<View>(R.id.seeDetails).setOnClickListener {
+                    val intent = Intent(this, DonationReceivedDetailActivity::class.java)
+                    intent.putExtra("confirmationDate", receivedConfirmation?.get("confirmationDate")?.let { formatTimestamp(it as Timestamp) })
+                    intent.putExtra("confirmationMessage", receivedConfirmation?.get("confirmationMessage") as? String)
+                    intent.putExtra("donationImageUrl", receivedConfirmation?.get("receivedProofImageUrl") as? String)
+                    startActivity(intent)
+                }
             }
         }
     }
