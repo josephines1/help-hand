@@ -1,5 +1,6 @@
 package com.example.helphandv10.activity
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -50,6 +51,13 @@ class DonationSendDetailActivity : AppCompatActivity() {
 
         binding.icBack.setOnClickListener {
             finish()
+        }
+
+        // Set OnClickListener to tv_donatur
+        binding.tvDonatur.setOnClickListener {
+            val intent = Intent(this, ViewProfileActivity::class.java)
+            intent.putExtra("donorId", donorId)
+            startActivity(intent)
         }
     }
 }

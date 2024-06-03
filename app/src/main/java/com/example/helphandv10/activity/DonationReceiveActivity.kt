@@ -28,7 +28,6 @@ import com.example.helphandv10.model.ReceivedConfirmation
 import com.example.helphandv10.model.SentConfirmation
 import com.example.helphandv10.utils.Resource
 import com.example.helphandv10.viewmodel.form.DonationReceiveViewModel
-import com.example.helphandv10.activity.ViewProfileActivity
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.storage.FirebaseStorage
@@ -196,11 +195,6 @@ class DonationReceiveActivity : AppCompatActivity() {
             finish()
         }
 
-        tvDonatur.setOnClickListener {
-            val intent = Intent(this, ViewProfileActivity::class.java)
-            intent.putExtra("DONOR_ID", donorId)
-            startActivity(intent)
-        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
