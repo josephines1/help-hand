@@ -10,6 +10,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.example.helphandv10.activity.AboutActivity
+import com.example.helphandv10.activity.EditProfileActivity
 import com.example.helphandv10.activity.HelpActivity
 import com.example.helphandv10.activity.MainActivity
 import com.example.helphandv10.activity.SettingActivity
@@ -70,6 +71,11 @@ class ProfileFragment : Fragment() {
         // Set onClickListener for the settings button
         binding.btnSetting.setOnClickListener {
             val intent = Intent(activity, SettingActivity::class.java)
+            startActivity(intent)
+        }
+        //set onClickListener directly to edit profile
+         binding.ivUserPhotoProfile.setOnClickListener {
+            val intent = Intent(activity, EditProfileActivity::class.java)
             startActivity(intent)
         }
 

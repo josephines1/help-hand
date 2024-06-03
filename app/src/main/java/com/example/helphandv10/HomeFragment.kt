@@ -1,9 +1,7 @@
 package com.example.helphandv10
 
-import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,13 +9,13 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.helphandv10.adapter.ListAdapter
 import com.example.helphandv10.databinding.FragmentHomeBinding
-import com.example.helphandv10.model.Donations
 import com.example.helphandv10.viewmodel.donation.ListViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
@@ -68,10 +66,14 @@ class HomeFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
+
     ): View? {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
+
     }
+
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -123,6 +125,8 @@ class HomeFragment : Fragment() {
         tv_username.setOnClickListener {
             replaceFragment(ProfileFragment(), R.id.nav_item_profile)
         }
+
+
 
         recyclerView = view.findViewById(R.id.rv_donations)
         cardLoading = view.findViewById(R.id.cardLoading)
@@ -192,3 +196,4 @@ class HomeFragment : Fragment() {
             }
     }
 }
+

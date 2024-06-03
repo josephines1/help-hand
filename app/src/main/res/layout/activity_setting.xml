@@ -33,7 +33,6 @@
                 android:id="@+id/tv_create_top_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
                 android:fontFamily="@font/poppins_medium"
                 android:text="Settings"
                 android:textSize="18sp"
@@ -86,7 +85,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/btn_setting"
+            android:id="@+id/btn_change_password"
             android:layout_width="match_parent"
             android:layout_height="65dp"
             android:layout_marginStart="20dp"

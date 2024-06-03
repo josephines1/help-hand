@@ -32,6 +32,8 @@ class LoginActivity : AppCompatActivity() {
 //            insets
 //        }
 
+
+
         initComponents()
         tv_doNotHaveAnAccount.setOnClickListener {
             val intent = Intent(this, SignUpActivity::class.java)
@@ -76,6 +78,8 @@ class LoginActivity : AppCompatActivity() {
                         Toast.makeText(this, "Login Gagal", Toast.LENGTH_SHORT).show()
                     }
                 }
+
+
         }
     }
 }

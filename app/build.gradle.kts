@@ -43,6 +43,8 @@ android {
 
 dependencies {
 
+    implementation ("com.github.dhaval2404:imagepicker:2.1")
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

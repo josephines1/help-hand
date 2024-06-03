@@ -7,6 +7,9 @@
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
 
     <application
         android:name=".App"
@@ -26,7 +29,16 @@
             android:name=".activity.DonationSendDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.TrackDonationActivity"
+            android:name=".activity.ChangePasswordActivity"
+            android:exported="false" />
+        <!-- <activity -->
+        <!-- android:name=".activity.TrackDonationActivity" -->
+        <!-- android:exported="false" /> -->
+        <activity
+            android:name=".activity.EditProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.DeleteAccountActivity"
             android:exported="false" />
         <activity
             android:name=".activity.DonationSendActivity"

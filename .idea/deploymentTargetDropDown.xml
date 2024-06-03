@@ -2,6 +2,28 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
+      <entry key="ChangePasswordActivity">
+        <State>
+          <runningDeviceTargetSelectedWithDropDown>
+            <Target>
+              <type value="RUNNING_DEVICE_TARGET" />
+              <deviceKey>
+                <Key>
+                  <type value="SERIAL_NUMBER" />
+                  <value value="a1821421" />
+                </Key>
+              </deviceKey>
+            </Target>
+          </runningDeviceTargetSelectedWithDropDown>
+          <timeTargetWasSelectedWithDropDown value="2024-06-03T13:31:18.891997600Z" />
+        </State>
+      </entry>
+      <entry key="EditProfileActivity">
+        <State />
+      </entry>
+      <entry key="SettingActivity">
+        <State />
+      </entry>
       <entry key="app">
         <State />
       </entry>
