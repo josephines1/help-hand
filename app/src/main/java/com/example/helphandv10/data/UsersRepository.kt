@@ -12,17 +12,6 @@ import kotlinx.coroutines.tasks.await
 class UsersRepository(
     private val firestoreDb: FirebaseFirestore
 ) {
-    suspend fun insert(user: Users) : Flow<Resource<Unit>> = flow {
-        emit(Resource.Loading)
-        try {
-            val ref = firestoreDb.collection("users")
-            ref.add(user)
-            emit(Resource.Success(Unit))
-        } catch (e: Error) {
-            Log.e("UsersRepository: Insert", e.toString())
-            emit(Resource.Error(e.toString()))
-        }
-    }
 
     fun getUserById(userId: String): Flow<Resource<DocumentSnapshot>> = flow {
         val userRef = firestoreDb.collection("users").document(userId)
@@ -36,14 +25,6 @@ class UsersRepository(
         }
     }
 
-    fun getUser(): Flow<List<Users>> = flow {
-        val ref = firestoreDb.collection("users")
-        val querySnapshot = ref.get().await()
-        if (!querySnapshot.isEmpty) {
-            emit(querySnapshot.toObjects(Users::class.java))
-        }
-    }
-
     suspend fun update(user: Users): Flow<Resource<Unit>> = flow {
         emit(Resource.Loading)
         try {
@@ -52,7 +33,6 @@ class UsersRepository(
                 mapOf(
                     "username" to user.username,
                     "email" to user.email,
-                    "password" to user.password,
                     "phoneNumber" to user.phoneNumber,
                     "photoProfileURL" to user.photoProfileURL,
                 )

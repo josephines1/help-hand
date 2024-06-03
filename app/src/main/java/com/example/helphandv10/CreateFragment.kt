@@ -27,6 +27,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
+import com.example.helphandv10.activity.EditProfileActivity
 import com.example.helphandv10.activity.MainActivity
 import com.example.helphandv10.activity.SuccessCreateDonation
 import com.example.helphandv10.adapter.NeedsAdapter
@@ -202,7 +203,8 @@ class CreateFragment : Fragment() {
         val dialog = builder.create()
 
         positiveButton.setOnClickListener {
-            replaceFragment(ProfileFragment(), R.id.nav_item_profile)
+            val intent = Intent(requireContext(), EditProfileActivity::class.java)
+            startActivity(intent)
             dialog.dismiss()
         }
 
