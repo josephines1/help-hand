@@ -67,6 +67,9 @@
             android:name=".activity.HelpActivity"
             android:exported="true" />
         <activity
+            android:name=".activity.ViewProfileActivity"
+            android:exported="true" />
+        <activity
             android:name=".activity.SettingActivity"
             android:exported="true" />
         <activity

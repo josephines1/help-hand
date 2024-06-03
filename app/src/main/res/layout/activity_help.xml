@@ -4,8 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/main"
     android:background="@color/background"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".activity.HelpActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -81,7 +83,7 @@
         </LinearLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/btn_visit_helpcenter"
+            android:id="@+id/btn_helpcenterWA"
             android:layout_width="match_parent"
             android:layout_height="70dp"
             android:layout_marginStart="20dp"
@@ -97,7 +99,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="1dp"
                 android:fontFamily="@font/poppins_bold"
-                android:text="Visit Help Center"
+                android:text="Contact us via Whatsapp"
                 android:textColor="@color/black"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
@@ -119,10 +121,10 @@
                 app:layout_constraintBottom_toBottomOf="parent" />
 
             <ImageView
-                android:id="@+id/icon_setting"
+                android:id="@+id/icon_suggest"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:layout_marginStart="300dp"
+                android:layout_marginStart="284dp"
                 android:src="@drawable/ic_suggest"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -131,7 +133,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/btn_email"
+            android:id="@+id/btn_helpcenterEmail"
             android:layout_width="match_parent"
             android:layout_height="65dp"
             android:layout_marginStart="20dp"
@@ -172,7 +174,7 @@
                 android:id="@+id/icon_email"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:layout_marginStart="300dp"
+                android:layout_marginStart="284dp"
                 android:src="@drawable/ic_email"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -224,7 +226,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="1dp"
                 android:fontFamily="@font/poppins_bold"
-                android:text="support@helphand.com"
+                android:text="helphandcenter@gmail.com"
                 android:textColor="@color/black"
                 android:textSize="10sp"
                 app:layout_constraintStart_toStartOf="parent"
