@@ -221,7 +221,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/poppins_regular"
                         android:paddingVertical="0.5dp"
-                        android:text="as a organizer"
+                        android:text="as an organizer"
                         android:textSize="14dp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"

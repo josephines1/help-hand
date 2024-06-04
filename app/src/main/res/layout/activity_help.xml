@@ -72,7 +72,7 @@
 
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="29dp"
                 android:layout_gravity="center_horizontal"
                 android:fontFamily="@font/poppins_regular"
                 android:gravity="center"
@@ -124,10 +124,10 @@
                 android:id="@+id/icon_suggest"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:layout_marginStart="284dp"
                 android:src="@drawable/ic_suggest"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/tv_visit_hc2"
                 app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -174,10 +174,10 @@
                 android:id="@+id/icon_email"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:layout_marginStart="284dp"
                 android:src="@drawable/ic_email"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/tv_contact_email2"
                 app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

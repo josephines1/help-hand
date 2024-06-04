@@ -13,7 +13,6 @@ import com.example.helphandv10.R
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import java.security.MessageDigest
 
 class ChangePasswordActivity : AppCompatActivity() {
 
@@ -73,8 +72,6 @@ class ChangePasswordActivity : AppCompatActivity() {
             return
         }
 
-        // Hash the new password
-        val hashedPassword = hashPassword(newPassword)
 
         // Reauthenticate user to verify current password
         val credential = currentUser.email?.let { EmailAuthProvider.getCredential(it, currentPassword) }
@@ -98,17 +95,12 @@ class ChangePasswordActivity : AppCompatActivity() {
                             }
                     } else {
                         // Failed to reauthenticate user
-                        Toast.makeText(this, "Failed to reauthenticate user: ${reauthTask.exception?.message}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Failed to authenticate user: ${reauthTask.exception?.message}", Toast.LENGTH_SHORT).show()
                     }
                 }
         }
     }
 
-    // Hashing function using SHA-256
-    private fun hashPassword(password: String): String {
-        val bytes = MessageDigest.getInstance("SHA-256").digest(password.toByteArray())
-        return bytes.joinToString("") { "%02x".format(it) }
-    }
 
     // Custom transformation method to show last character temporarily before hiding it
     private class AsteriskPasswordTransformationMethod : PasswordTransformationMethod() {

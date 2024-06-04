@@ -87,7 +87,7 @@
                 android:layout_marginTop="16dp"
                 android:fontFamily="@font/poppins_bold"
                 android:text="The #1 Trusted Donation Platform in Indonesia"
-                android:textSize="15dp"
+                android:textSize="14dp"
                 android:textColor="@color/black"
                 app:layout_constraintTop_toBottomOf="@+id/tv_about"
                 app:layout_constraintStart_toStartOf="parent"
@@ -96,8 +96,8 @@
 
             <ImageView
                 android:id="@+id/center_image"
-                android:layout_width="389dp"
-                android:layout_height="184dp"
+                android:layout_width="475dp"
+                android:layout_height="175dp"
                 android:layout_marginTop="1dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
@@ -163,7 +163,7 @@
                         android:fontFamily="@font/poppins_regular"
                         android:text="people have donated"
                         android:textColor="@color/black"
-                        android:textSize="12dp" />
+                        android:textSize="10dp" />
                 </LinearLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -202,7 +202,7 @@
                         android:fontFamily="@font/poppins_regular"
                         android:text="people started fundraisers"
                         android:textColor="@color/black"
-                        android:textSize="12dp" />
+                        android:textSize="10dp" />
                 </LinearLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>

@@ -9,6 +9,7 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.bumptech.glide.Glide
 import com.example.helphandv10.R
 import com.example.helphandv10.viewmodel.donation.TrackDonationViewModel
@@ -36,7 +37,7 @@ class TrackDonationActivity : AppCompatActivity() {
             onBackPressed()
         }
 
-        findViewById<TextView>(R.id.backToHomeButton).setOnClickListener {
+        findViewById<ConstraintLayout>(R.id.backToHomeButton).setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
             finish()
